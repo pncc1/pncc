@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNC Bank | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #003366;
+            --accent-orange: #FF8200;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+            --white: #FFFFFF;
+            --success-green: #28a745;
+            --error-red: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        .dashboard-header {
+            background-color: var(--white);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 30px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .hamburger {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 0;
+            background-color: var(--primary-blue);
+            color: white;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: calc(100vh - 60px);
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.active {
+            width: 250px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-signout {
+            background-color: transparent;
+            color: white;
+            text-align: left;
+            padding: 0.8rem 1.5rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-signout:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            width: 100%;
+        }
+
+        .welcome-banner {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .account-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .account-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .account-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .account-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .account-status {
+            font-size: 0.9rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            background-color: var(--success-green);
+            color: white;
+        }
+
+        .account-balance {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            color: var(--primary-blue);
+        }
+
+        .account-number {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .account-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-sm {
+            font-size: 0.9rem;
+            padding: 0.6rem 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #002b57;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-action {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.2rem 0.8rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .quick-action i {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-action p {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .transactions {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .view-all {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .transaction-table th,
+        .transaction-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-table th {
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .transaction-table td {
+            font-size: 0.9rem;
+        }
+
+        .positive {
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .negative {
+            color: var(--error-red);
+            font-weight: 600;
+        }
+
+        .info-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid var(--primary-blue);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box h4 {
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .international-transfer-section {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .international-transfer-section:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Professional Success Animation - UPDATED FOR MOBILE */
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .success-content {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .success-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--success-green));
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--success-green);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: iconAppear 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .success-icon i {
+            font-size: 28px;
+            color: white;
+            animation: checkmarkScale 0.5s ease 0.3s both;
+        }
+
+        .success-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--success-green);
+            animation: ripple 1.5s ease-out infinite;
+        }
+
+        @keyframes iconAppear {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes checkmarkScale {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        .success-details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border-left: 4px solid var(--primary-blue);
+            overflow-x: auto;
+        }
+
+        .success-details p {
+            margin: 10px 0;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #e0e0e0;
+            padding-bottom: 6px;
+            flex-wrap: wrap;
+            word-break: break-word;
+        }
+
+        .success-details p:last-child {
+            border-bottom: none;
+        }
+
+        .success-details p strong {
+            color: var(--primary-blue);
+            min-width: 120px;
+            margin-right: 10px;
+        }
+
+        .success-details p span {
+            flex: 1;
+            text-align: right;
+        }
+
+        .close-success {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .close-success:hover {
+            background: #00254d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 51, 102, 0.3);
+        }
+
+        .success-content h2 {
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .success-content > p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e8f5e9;
+            color: var(--success-green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .transaction-id {
+            font-family: 'Courier New', monospace;
+            background: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+            word-break: break-all;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 250px;
+                position: static;
+                height: auto;
+            }
+
+            .main-content {
+                width: calc(100% - 250px);
+            }
+
+            .hamburger {
+                display: none;
+            }
+
+            .account-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            /* Larger screens adjustments */
+            .success-content {
+                padding: 40px 30px;
+            }
+
+            .success-icon {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 25px;
+            }
+
+            .success-icon i {
+                font-size: 36px;
+            }
+
+            .success-details {
+                padding: 20px;
+                margin: 25px 0;
+            }
+
+            .success-details p {
+                font-size: 15px;
+                margin: 12px 0;
+                padding-bottom: 8px;
+            }
+
+            .success-details p strong {
+                min-width: 140px;
+            }
+
+            .close-success {
+                padding: 14px 30px;
+                font-size: 16px;
+                gap: 10px;
+            }
+
+            .success-content h2 {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .success-content > p {
+                font-size: 16px;
+                margin-bottom: 25px;
+            }
+
+            .status-indicator {
+                padding: 8px 16px;
+                font-size: 14px;
+                gap: 8px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .quick-actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .account-balance {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Account Card Balance Animation */
+        @keyframes balanceUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); color: var(--success-green); }
+            100% { transform: scale(1); }
+        }
+
+        .balance-update {
+            animation: balanceUpdate 0.5s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="dashboard-header">
+        <div class="logo">
+            <img src="PNC-Bank-Logo.jpg" alt="PNC Bank Logo">
+            <span>PNC Online Banking</span>
+        </div>
+        <div class="header-controls">
+            <div class="user-avatar">CK</div>
+            <button class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="dashboard.html"><i class="fas fa-wallet"></i> Accounts</a></li>
+                <li><a href="transfer.html"><i class="fas fa-exchange-alt"></i> Transfer</a></li>
+                <li><a href="paybills.html"><i class="fas fa-money-bill-wave"></i> Pay Bills</a></li>
+                <li><a href="cards.html"><i class="fas fa-credit-card"></i> Cards</a></li>
+                <li><a href="investment.html"><i class="fas fa-chart-line"></i> Investments</a></li>
+                <li><a href="savings.html"><i class="fas fa-piggy-bank"></i> Savings Goals</a></li>
+                <li><a href="message.html"><i class="fas fa-envelope"></i> Messages</a></li>
+                <li><a href="statement.html"><i class="fas fa-file-invoice-dollar"></i> Statements</a></li>
+                <li><a href="security.html"><i class="fas fa-user-shield"></i> Security</a></li>
+                <li><a href="help.html"><i class="fas fa-question-circle"></i> Help</a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn-signout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="welcome-banner">
+                <h2>Welcome back, Chunk Keat!</h2>
+                <p>Here's what's happening with your accounts today.</p>
+            </div>
+
+            <div class="account-cards">
+                <div class="account-card" id="virtual-wallet-card">
+                    <div class="account-card-header">
+                        <h3>Virtual Account</h3>
+                        <span class="account-status">Active</span>
+                    </div>
+                    <div class="account-balance" id="virtual-balance">$50,000.00</div>
+                    <div class="account-number">Account ending in ••••7890</div>
+                    <div class="account-actions">
+                        <a href="details.html" class="btn btn-primary btn-sm">Details</a>
+                        <a href="transfer.html" class="btn btn-primary btn-sm">Transfer</a>
+                        <button class="btn btn-primary btn-sm deposit-btn" data-account="virtual">Deposit</button>
+                    </div>
+                </div>
+
+                <div class="account-card" id="savings-account-card">
+                    <div class="account-card-header">
+                        <h3>Savings Account</h3>
+                    </div>
+                    <div class="account-balance" id="savings-balance">$50,000.00</div>
+                    <div class="account-number">Account ending in ••••4567</div>
+                    <div class="account-actions">
+                        <a href="details.html" class="btn btn-primary btn-sm">Details</a>
+                        <a href="transfer.html" class="btn btn-primary btn-sm">Transfer</a>
+                        <button class="btn btn-primary btn-sm deposit-btn" data-account="savings">Deposit</button>
+                    </div>
+                </div>
+
+                <div class="account-card" id="grant-funds-card">
+                    <div class="account-card-header">
+                        <h3>Grant Funds</h3>
+                        <span class="account-status">Active</span>
+                    </div>
+                    <div class="account-balance" id="grant-balance">$600,000.00</div>
+                    <div class="account-number">Account ending in ••••1234</div>
+                    <div class="account-actions">
+                        <a href="details.html" class="btn btn-primary btn-sm">Details</a>
+                        <a href="transfer.html" class="btn btn-primary btn-sm">Transfer</a>
+                        <button class="btn btn-primary btn-sm deposit-btn" data-account="grant">Deposit</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="international-transfer-section">
+                <h3 style="margin-bottom: 1rem; color: var(--primary-blue);">
+                    <i class="fas fa-globe-americas"></i> International Transfer to Singapore
+                </h3>
+                <div class="info-box">
+                    <h4><i class="fas fa-user-circle"></i> Recipient Information</h4>
+                    <p><strong>Name:</strong> Chung Keat</p>
+                    <p><strong>Phone:</strong> +65 7785 4325</p>
+                    <p><strong>Country:</strong> Singapore</p>
+                    <p><strong>Date of Birth:</strong> 27/11/1943</p>
+                    <p><strong>Email:</strong> charity200@gmail.com</p>
+                    <p><strong>Account Code:</strong> London</p>
+                    <!-- <p><strong>Password:</strong> chacha</p> -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="intlFromAccount">From Account:</label>
+                    <select class="form-control" id="intlFromAccount">
+                        <option value="virtual">Virtual Wallet - $50,000.00 (••••7890)</option>
+                        <option value="savings">Savings Account - $50,000.00 (••••4567)</option>
+                        <option value="grant">Grant Funds - $600,000.00 (••••1234)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="intlAmount">Amount (USD):</label>
+                    <input type="number" class="form-control" id="intlAmount" min="100" max="1000000" step="0.01" placeholder="Minimum $100.00">
+                    <small style="color: #666; font-size: 0.9rem;">International transfers require minimum $100.00</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="intlPurpose">Purpose of Transfer:</label>
+                    <select class="form-control" id="intlPurpose">
+                        <option value="family_support">Family Support</option>
+                        <option value="business">Business Payment</option>
+                        <option value="investment">Investment</option>
+                        <option value="education">Education Fees</option>
+                        <option value="charity">Charity Donation</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="intlNotes">Additional Notes:</label>
+                    <textarea class="form-control" id="intlNotes" rows="3" placeholder="Any additional information for the recipient..."></textarea>
+                </div>
+                
+                <button id="initiateInternationalTransfer" class="btn btn-warning" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                    <i class="fas fa-plane"></i> Initiate International Transfer to Singapore
+                </button>
+            </div>
+
+            <div class="quick-actions">
+                <div class="quick-action" data-action="transfer">
+                    <i class="fas fa-exchange-alt"></i>
+                    <p>Transfer</p>
+                </div>
+                <div class="quick-action" data-action="pay-bills">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <p>Pay Bills</p>
+                </div>
+                <div class="quick-action" data-action="deposit">
+                    <i class="fas fa-mobile-alt"></i>
+                    <p>Deposit</p>
+                </div>
+                <div class="quick-action" data-action="international">
+                    <i class="fas fa-globe-americas"></i>
+                    <p>International</p>
+                </div>
+            </div>
+
+            <div id="quickDepositModal" class="modal">
+                <div class="modal-content">
+                    <h3>Mobile Deposit</h3>
+                    <div class="form-group">
+                        <label>Select Account</label>
+                        <select class="form-control" id="depositAccount">
+                            <option value="virtual">Virtual Wallet (••••7890)</option>
+                            <option value="savings">Savings Account (••••4567)</option>
+                            <option value="grant">Grant Funds (••••1234)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" class="form-control" id="quickDepositAmount" min="0.01" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Check Front Image</label>
+                        <input type="file" id="checkFront" accept="image/*" capture="camera">
+                    </div>
+                    <div class="form-group">
+                        <label>Check Back Image</label>
+                        <input type="file" id="checkBack" accept="image/*" capture="camera">
+                    </div>
+                    <div class="form-actions">
+                        <button id="cancelQuickDeposit" class="btn" style="background:#ccc;">Cancel</button>
+                        <button id="confirmQuickDeposit" class="btn btn-primary">Submit Deposit</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="transactions">
+                <div class="transactions-header">
+                    <h3>Recent Transactions</h3>
+                    <a href="details.html" class="view-all">View All</a>
+                </div>
+                <table class="transaction-table" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <!-- Transactions will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <h3>Make a Deposit</h3>
+            <p>Account: <span id="depositAccountName"></span></p>
+            <div class="form-group">
+                <label for="depositAmount">Amount:</label>
+                <input type="number" class="form-control" id="depositAmount" min="0.01" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-actions">
+                <button id="cancelDeposit" class="btn" style="background:#ccc;">Cancel</button>
+                <button id="confirmDeposit" class="btn btn-primary">Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- International Transfer Modal -->
+    <div id="internationalModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-globe-americas"></i> Confirm International Transfer</h3>
+            <div id="intlConfirmationDetails"></div>
+            <div class="form-group">
+                <label for="securityCode">Security Verification Code:</label>
+                <input type="password" class="form-control" id="securityCode" maxlength="6" placeholder="Enter 6-digit code">
+                <small>For security, please enter the code sent to your registered phone.</small>
+            </div>
+            <div class="form-actions">
+                <button id="cancelInternational" class="btn" style="background:#ccc;">Cancel</button>
+                <button id="confirmInternational" class="btn btn-warning">Confirm & Send Transfer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional Success Modal -->
+    <div id="successModal" class="success-modal">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            
+            <span class="status-indicator">
+                <i class="fas fa-circle" style="font-size: 8px;"></i>
+                TRANSACTION SUCCESSFUL
+            </span>
+            
+            <h2>International Transfer Initiated</h2>
+            <p>Your transfer has been queued for processing with our international banking partners.</p>
+            
+            <div class="success-details" id="successDetails">
+                <!-- Success details will be injected here -->
+            </div>
+            
+            <div style="background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid var(--accent-orange);">
+                <p style="margin: 0; color: #666; font-size: 14px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-clock" style="color: var(--accent-orange);"></i>
+                    <strong>Processing Time:</strong> 1-3 business days
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666; font-size: 14px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-envelope" style="color: var(--primary-blue);"></i>
+                    <strong>Confirmation:</strong> Email notification will be sent shortly
+                </p>
+            </div>
+            
+            <button class="close-success" id="closeSuccess">
+                <i class="fas fa-check-circle"></i>
+                Acknowledge & Return to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const ACCOUNT_TYPES = {
+            VIRTUAL: 'virtual',
+            SAVINGS: 'savings',
+            GRANT: 'grant'
+        };
+
+        const SINGAPORE_RECIPIENT = {
+            firstName: "Chung",
+            lastName: "Keat",
+            phone: "+6577854325",
+            country: "Singapore",
+            dob: "27/11/1943",
+            flashCode: "London",
+            password: "chacha",
+            email: "charity200@gmail.com"
+        };
+
+        function initializeAccounts() {
+            localStorage.removeItem('accounts');
+            
+            const defaultAccounts = {
+                [ACCOUNT_TYPES.VIRTUAL]: {
+                    id: ACCOUNT_TYPES.VIRTUAL,
+                    name: "Virtual Wallet",
+                    number: "••••7890",
+                    balance: 50000.00,
+                    status: "Active"
+                },
+                [ACCOUNT_TYPES.SAVINGS]: {
+                    id: ACCOUNT_TYPES.SAVINGS,
+                    name: "Savings Account",
+                    number: "••••4567",
+                    balance: 50000.00,
+                    status: ""
+                },
+                [ACCOUNT_TYPES.GRANT]: {
+                    id: ACCOUNT_TYPES.GRANT,
+                    name: "Grant Funds",
+                    number: "••••1234",
+                    balance: 600000.00,
+                    status: "Active"
+                }
+            };
+            localStorage.setItem('accounts', JSON.stringify(defaultAccounts));
+            return defaultAccounts;
+        }
+
+        function initializeTransactions() {
+            if (!localStorage.getItem('transactions')) {
+                const defaultTransactions = [
+                    createTransaction("Initial Virtual Account Deposit", 50000.00, ACCOUNT_TYPES.VIRTUAL),
+                    createTransaction("Initial Savings Deposit", 50000.00, ACCOUNT_TYPES.SAVINGS),
+                    createTransaction("Grant Funds Deposit", 600000.00, ACCOUNT_TYPES.GRANT),
+                    createTransaction("Amazon Purchase", -89.99, ACCOUNT_TYPES.VIRTUAL),
+                    createTransaction("Direct Deposit", 2500.00, ACCOUNT_TYPES.VIRTUAL),
+                    createTransaction("Utility Payment", -120.50, ACCOUNT_TYPES.VIRTUAL)
+                ];
+                localStorage.setItem('transactions', JSON.stringify(defaultTransactions));
+                return defaultTransactions;
+            }
+            return JSON.parse(localStorage.getItem('transactions'));
+        }
+
+        function createTransaction(description, amount, accountId) {
+            return {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                description,
+                amount,
+                account: accountId,
+                status: "Completed"
+            };
+        }
+
+        function formatCurrency(amount) {
+            const num = Number(amount);
+            if (isNaN(num)) return "$0.00";
+
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        function formatShortDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function updateAccountBalances(accounts) {
+            const virtualBalance = document.getElementById('virtual-balance');
+            const savingsBalance = document.getElementById('savings-balance');
+            const grantBalance = document.getElementById('grant-balance');
+            
+            virtualBalance.textContent = formatCurrency(accounts[ACCOUNT_TYPES.VIRTUAL].balance);
+            savingsBalance.textContent = formatCurrency(accounts[ACCOUNT_TYPES.SAVINGS].balance);
+            grantBalance.textContent = formatCurrency(accounts[ACCOUNT_TYPES.GRANT].balance);
+            
+            virtualBalance.classList.add('balance-update');
+            savingsBalance.classList.add('balance-update');
+            grantBalance.classList.add('balance-update');
+            
+            setTimeout(() => {
+                virtualBalance.classList.remove('balance-update');
+                savingsBalance.classList.remove('balance-update');
+                grantBalance.classList.remove('balance-update');
+            }, 500);
+        }
+
+        function renderTransactions(transactions) {
+            const tbody = document.getElementById('transactionsBody');
+            tbody.innerHTML = '';
+
+            const sorted = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+            sorted.slice(0, 10).forEach(tx => {
+                const amount = Number(tx.amount);
+                const isValidAmount = !isNaN(amount);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatShortDate(tx.date)}</td>
+                    <td>${tx.description || 'Unknown Transaction'}</td>
+                    <td class="${isValidAmount ? (amount > 0 ? 'positive' : 'negative') : ''}">
+                        ${isValidAmount ? (amount > 0 ? '+' : '') + formatCurrency(amount) : '$0.00'}
+                    </td>
+                    <td>${tx.status || 'Completed'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function showSuccessModal(transferDetails) {
+            const successModal = document.getElementById('successModal');
+            const successDetails = document.getElementById('successDetails');
+            
+            const referenceNumber = `INTL-${Date.now().toString().slice(-8)}`;
+            
+            successDetails.innerHTML = `
+                <p>
+                    <strong>Reference Number:</strong>
+                    <span class="transaction-id">${referenceNumber}</span>
+                </p>
+                <p><strong>Beneficiary:</strong> ${transferDetails.recipient.firstName} ${transferDetails.recipient.lastName}</p>
+                <p><strong>Destination:</strong> ${transferDetails.recipient.country}</p>
+                <p><strong>Amount:</strong> ${formatCurrency(transferDetails.amount)}</p>
+                <p><strong>Service Fee:</strong> $35.00</p>
+                <p><strong>Total Debit:</strong> ${formatCurrency(transferDetails.amount + 35)}</p>
+                <p><strong>Source Account:</strong> ${transferDetails.fromAccount}</p>
+                <p><strong>Initiated:</strong> ${new Date().toLocaleString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}</p>
+            `;
+            
+            successModal.style.display = 'flex';
+        }
+
+        function processInternationalTransfer(fromAccountId, amount, purpose, notes, recipient) {
+            const accounts = JSON.parse(localStorage.getItem('accounts'));
+            const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+            if (accounts[fromAccountId].balance < (amount + 35)) {
+                return { success: false, message: "Insufficient funds for this transfer including the $35 service fee." };
+            }
+
+            accounts[fromAccountId].balance -= (amount + 35);
+
+            const transaction = createTransaction(
+                `International Transfer to Singapore - ${purpose}`,
+                -(amount + 35),
+                fromAccountId
+            );
+            transaction.recipient = `${recipient.firstName} ${recipient.lastName}`;
+            transaction.country = "Singapore";
+            transaction.notes = notes;
+            transaction.fee = 35.00;
+            transactions.unshift(transaction);
+
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            updateAccountBalances(accounts);
+            renderTransactions(transactions);
+
+            return {
+                success: true,
+                message: `International transfer of ${formatCurrency(amount)} to Singapore has been initiated.`,
+                reference: `INTL-${Date.now().toString().slice(-8)}`,
+                transferDetails: {
+                    amount: amount,
+                    purpose: purpose,
+                    recipient: recipient,
+                    fromAccount: accounts[fromAccountId].name
+                }
+            };
+        }
+
+        function setupInternationalTransfer() {
+            const initiateBtn = document.getElementById('initiateInternationalTransfer');
+            const intlModal = document.getElementById('internationalModal');
+            const cancelIntlBtn = document.getElementById('cancelInternational');
+            const confirmIntlBtn = document.getElementById('confirmInternational');
+            const securityCodeInput = document.getElementById('securityCode');
+            const closeSuccessBtn = document.getElementById('closeSuccess');
+            const successModal = document.getElementById('successModal');
+
+            let pendingTransfer = null;
+
+            initiateBtn.addEventListener('click', function() {
+                const fromAccount = document.getElementById('intlFromAccount').value;
+                const amount = parseFloat(document.getElementById('intlAmount').value);
+                const purpose = document.getElementById('intlPurpose').value;
+                const notes = document.getElementById('intlNotes').value;
+
+                if (isNaN(amount) || amount < 100) {
+                    alert('International transfers require a minimum amount of $100.00');
+                    return;
+                }
+
+                const accounts = JSON.parse(localStorage.getItem('accounts'));
+                if (accounts[fromAccount].balance < (amount + 35)) {
+                    alert(`Insufficient funds. Available balance: ${formatCurrency(accounts[fromAccount].balance)}\nTransfer requires: ${formatCurrency(amount + 35)} (including $35 fee)`);
+                    return;
+                }
+
+                pendingTransfer = {
+                    fromAccount,
+                    amount,
+                    purpose,
+                    notes,
+                    recipient: SINGAPORE_RECIPIENT
+                };
+
+                const confirmationDetails = document.getElementById('intlConfirmationDetails');
+                confirmationDetails.innerHTML = `
+                    <div class="info-box">
+                        <p><strong>Transfer Details:</strong></p>
+                        <p><strong>From:</strong> ${accounts[fromAccount].name} (${accounts[fromAccount].number})</p>
+                        <p><strong>To:</strong> ${SINGAPORE_RECIPIENT.firstName} ${SINGAPORE_RECIPIENT.lastName}</p>
+                        <p><strong>Country:</strong> ${SINGAPORE_RECIPIENT.country}</p>
+                        <p><strong>Amount:</strong> ${formatCurrency(amount)} USD</p>
+                        <p><strong>Purpose:</strong> ${purpose.replace('_', ' ')}</p>
+                        <p><strong>Estimated Delivery:</strong> 1-3 business days</p>
+                        <p><strong>Service Fee:</strong> $35.00 (included in deduction)</p>
+                        <p><strong>Total Deduction:</strong> ${formatCurrency(amount + 35)}</p>
+                    </div>
+                `;
+
+                securityCodeInput.value = '';
+                intlModal.style.display = 'flex';
+            });
+
+            cancelIntlBtn.addEventListener('click', function() {
+                intlModal.style.display = 'none';
+                pendingTransfer = null;
+            });
+
+            confirmIntlBtn.addEventListener('click', function() {
+                const securityCode = securityCodeInput.value;
+                
+                if (!securityCode || securityCode.length !== 6) {
+                    alert('Please enter a valid 6-digit security code');
+                    return;
+                }
+
+                if (!pendingTransfer) {
+                    alert('Transfer details are missing. Please try again.');
+                    return;
+                }
+
+                if (securityCode.length !== 6) {
+                    alert('Invalid security code. Please enter a 6-digit code.');
+                    return;
+                }
+
+                const result = processInternationalTransfer(
+                    pendingTransfer.fromAccount,
+                    pendingTransfer.amount,
+                    pendingTransfer.purpose,
+                    pendingTransfer.notes,
+                    pendingTransfer.recipient
+                );
+
+                if (result.success) {
+                    intlModal.style.display = 'none';
+                    showSuccessModal(result.transferDetails);
+                    
+                    document.getElementById('intlAmount').value = '';
+                    document.getElementById('intlNotes').value = '';
+                } else {
+                    alert(`❌ Transfer Failed\n${result.message}`);
+                }
+
+                pendingTransfer = null;
+            });
+
+            closeSuccessBtn.addEventListener('click', function() {
+                successModal.style.display = 'none';
+            });
+
+            intlModal.addEventListener('click', function(e) {
+                if (e.target === intlModal) {
+                    intlModal.style.display = 'none';
+                    pendingTransfer = null;
+                }
+            });
+
+            successModal.addEventListener('click', function(e) {
+                if (e.target === successModal) {
+                    successModal.style.display = 'none';
+                }
+            });
+        }
+
+        function setupDepositButtons() {
+            const depositButtons = document.querySelectorAll('.deposit-btn');
+            const modal = document.getElementById('depositModal');
+            const cancelBtn = document.getElementById('cancelDeposit');
+            const confirmBtn = document.getElementById('confirmDeposit');
+            const depositAmount = document.getElementById('depositAmount');
+            const depositAccountName = document.getElementById('depositAccountName');
+
+            let currentAccount = null;
+
+            depositButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    currentAccount = this.getAttribute('data-account');
+                    const accounts = JSON.parse(localStorage.getItem('accounts'));
+                    depositAccountName.textContent = accounts[currentAccount].name;
+                    depositAmount.value = '';
+                    modal.style.display = 'flex';
+                });
+            });
+
+            cancelBtn.addEventListener('click', function () {
+                modal.style.display = 'none';
+            });
+
+            confirmBtn.addEventListener('click', function () {
+                const amount = parseFloat(depositAmount.value);
+                if (isNaN(amount) || amount <= 0) {
+                    alert('Please enter a valid amount');
+                    return;
+                }
+
+                makeDeposit(currentAccount, amount);
+                modal.style.display = 'none';
+            });
+
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        function makeDeposit(accountId, amount) {
+            const accounts = JSON.parse(localStorage.getItem('accounts'));
+            const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+            accounts[accountId].balance += amount;
+
+            const transaction = createTransaction(
+                "Deposit",
+                amount,
+                accountId
+            );
+            transactions.unshift(transaction);
+
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            updateAccountBalances(accounts);
+            renderTransactions(transactions);
+
+            alert(`Successfully deposited ${formatCurrency(amount)} to ${accounts[accountId].name}`);
+        }
+
+        function setupMobileMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const sidebar = document.getElementById('sidebar');
+
+            hamburger.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function (event) {
+                if (window.innerWidth <= 768) {
+                    const isClickInsideSidebar = sidebar.contains(event.target);
+                    const isClickOnHamburger = hamburger.contains(event.target);
+
+                    if (!isClickInsideSidebar && !isClickOnHamburger) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        function setupLogoutButton() {
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                if (confirm('Are you sure you want to sign out?')) {
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+
+        function setupQuickActions() {
+            document.querySelectorAll('.quick-action').forEach(action => {
+                action.addEventListener('click', function () {
+                    const actionType = this.getAttribute('data-action');
+
+                    if (actionType === 'transfer') {
+                        window.location.href = 'transfer.html';
+                    }
+                    else if (actionType === 'deposit') {
+                        document.getElementById('quickDepositModal').style.display = 'flex';
+                    }
+                    else if (actionType === 'international') {
+                        document.querySelector('.international-transfer-section').scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                    else {
+                        alert(`Navigating to ${actionType.replace('-', ' ')} page...`);
+                    }
+                });
+            });
+
+            document.getElementById('cancelQuickDeposit').addEventListener('click', function () {
+                document.getElementById('quickDepositModal').style.display = 'none';
+            });
+
+            document.getElementById('confirmQuickDeposit').addEventListener('click', function () {
+                const account = document.getElementById('depositAccount').value;
+                const amount = parseFloat(document.getElementById('quickDepositAmount').value);
+
+                if (!amount || amount <= 0) {
+                    alert('Please enter a valid amount');
+                    return;
+                }
+
+                processQuickDeposit(account, amount);
+                document.getElementById('quickDepositModal').style.display = 'none';
+            });
+        }
+
+        function processQuickDeposit(accountId, amount) {
+            const accounts = JSON.parse(localStorage.getItem('accounts'));
+            const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+            accounts[accountId].balance += amount;
+
+            const transaction = createTransaction(
+                "Mobile Deposit",
+                amount,
+                accountId
+            );
+            transactions.unshift(transaction);
+
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+
+            updateAccountBalances(accounts);
+            renderTransactions(transactions);
+
+            document.getElementById('quickDepositAmount').value = '';
+            alert(`Successfully deposited ${formatCurrency(amount)} to ${accounts[accountId].name}`);
+        }
+
+        function initApp() {
+            let accounts = initializeAccounts();
+            let transactions = initializeTransactions();
+
+            updateAccountBalances(accounts);
+            renderTransactions(transactions);
+
+            setupMobileMenu();
+            setupLogoutButton();
+            setupQuickActions();
+            setupDepositButtons();
+            setupInternationalTransfer();
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) {
+                    document.getElementById('sidebar').classList.remove('active');
+                }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
