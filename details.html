@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNC Bank | Account Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #003366;
+            --accent-orange: #FF8200;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+            --white: #FFFFFF;
+            --success-green: #28a745;
+            --error-red: #dc3545;
+            --warning-yellow: #ffc107;
+            --info-blue: #17a2b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        .dashboard-header {
+            background-color: var(--white);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--dark-gray);
+        }
+
+        .logo img {
+            height: 30px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .hamburger {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 0;
+            background-color: var(--primary-blue);
+            color: white;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: calc(100vh - 60px);
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.active {
+            width: 250px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-signout {
+            background-color: transparent;
+            color: white;
+            text-align: left;
+            padding: 0.8rem 1.5rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-signout:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-title i {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--white);
+            color: var(--primary-blue);
+            text-decoration: none;
+            padding: 0.7rem 1rem;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .account-detail-header {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .account-info {
+            flex: 1;
+        }
+
+        .account-info h2 {
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .account-number {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .account-status {
+            display: inline-block;
+            font-size: 0.9rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success-green);
+        }
+
+        .account-balance {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+            text-align: right;
+        }
+
+        .account-balance small {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: normal;
+            display: block;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-card h3 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .btn {
+            padding: 0.7rem 1rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #002b57;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: var(--accent-orange);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e07500;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--error-red);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .transactions-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .view-all {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .transaction-table th,
+        .transaction-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-table th {
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .transaction-table td {
+            font-size: 0.9rem;
+        }
+
+        .positive {
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .negative {
+            color: var(--error-red);
+            font-weight: 600;
+        }
+
+        .transaction-status {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success-green);
+        }
+
+        .status-pending {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: var(--warning-yellow);
+        }
+
+        .status-failed {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: var(--error-red);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: var(--dark-gray);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            color: var(--primary-blue);
+        }
+
+        .action-button i {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary-blue);
+        }
+
+        .action-button span {
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .info-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid var(--primary-blue);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .info-box h4 {
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 250px;
+                position: static;
+                height: auto;
+            }
+
+            .main-content {
+                width: calc(100% - 250px);
+            }
+
+            .hamburger {
+                display: none;
+            }
+
+            .details-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .details-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="dashboard-header">
+        <a href="dashboard.html" class="logo">
+            <img src="PNC-Bank-Logo.jpg" alt="PNC Bank Logo">
+            <span>PNC Online Banking</span>
+        </a>
+        <div class="header-controls">
+            <div class="user-avatar">CK</div>
+            <button class="hamburger" id="hamburger">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="dashboard.html"><i class="fas fa-wallet"></i> Accounts</a></li>
+                <li><a href="transfer.html"><i class="fas fa-exchange-alt"></i> Transfer</a></li>
+                <li><a href="paybills.html"><i class="fas fa-money-bill-wave"></i> Pay Bills</a></li>
+                <li><a href="cards.html"><i class="fas fa-credit-card"></i> Cards</a></li>
+                <li><a href="investment.html"><i class="fas fa-chart-line"></i> Investments</a></li>
+                <li><a href="savings.html"><i class="fas fa-piggy-bank"></i> Savings Goals</a></li>
+                <li><a href="message.html"><i class="fas fa-envelope"></i> Messages</a></li>
+                <li><a href="statement.html"><i class="fas fa-file-invoice-dollar"></i> Statements</a></li>
+                <li><a href="security.html"><i class="fas fa-user-shield"></i> Security</a></li>
+                <li><a href="help.html"><i class="fas fa-question-circle"></i> Help</a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn-signout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-wallet"></i>
+                    <h1>Account Details</h1>
+                </div>
+                <a href="dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Account Detail Header -->
+            <div class="account-detail-header" id="accountDetailHeader">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="action-buttons">
+                <a href="#" class="action-button" id="transferBtn">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transfer Funds</span>
+                </a>
+                <a href="#" class="action-button" id="payBillBtn">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Pay Bills</span>
+                </a>
+                <a href="#" class="action-button" id="depositBtn">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Mobile Deposit</span>
+                </a>
+                <a href="#" class="action-button" id="statementBtn">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>View Statements</span>
+                </a>
+                <a href="#" class="action-button" id="reorderChecksBtn">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reorder Checks</span>
+                </a>
+                <a href="#" class="action-button" id="manageAlertsBtn">
+                    <i class="fas fa-bell"></i>
+                    <span>Manage Alerts</span>
+                </a>
+                <a href="#" class="action-button" id="updateInfoBtn">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Update Information</span>
+                </a>
+                <a href="#" class="action-button" id="cardControlsBtn">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Card Controls</span>
+                </a>
+            </div>
+
+            <!-- Account Details Grid -->
+            <div class="details-grid">
+                <div class="detail-card">
+                    <h3><i class="fas fa-info-circle"></i> Account Information</h3>
+                    <div class="detail-item">
+                        <span class="detail-label">Account Type</span>
+                        <span class="detail-value" id="accountType">Virtual Wallet</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Account Number</span>
+                        <span class="detail-value" id="fullAccountNumber">••••7890</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Routing Number</span>
+                        <span class="detail-value">043000096</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Open Date</span>
+                        <span class="detail-value">January 15, 2020</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Last Updated</span>
+                        <span class="detail-value">Today</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fas fa-chart-line"></i> Balance Details</h3>
+                    <div class="detail-item">
+                        <span class="detail-label">Available Balance</span>
+                        <span class="detail-value positive" id="availableBalance">$50,000.00</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Current Balance</span>
+                        <span class="detail-value" id="currentBalance">$50,000.00</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Pending Transactions</span>
+                        <span class="detail-value" id="pendingAmount">$0.00</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Overdraft Protection</span>
+                        <span class="detail-value">Linked to Savings</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Credit Limit</span>
+                        <span class="detail-value">$5,000.00</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fas fa-cog"></i> Account Settings</h3>
+                    <div class="detail-item">
+                        <span class="detail-label">Interest Rate</span>
+                        <span class="detail-value">0.01% APY</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Monthly Fee</span>
+                        <span class="detail-value negative">$0.00</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Statement Cycle</span>
+                        <span class="detail-value">Monthly</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">eStatements</span>
+                        <span class="detail-value">Enabled</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Auto-Save</span>
+                        <span class="detail-value">$100/Month</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="transactions-card">
+                <div class="transactions-header">
+                    <h3><i class="fas fa-history"></i> Recent Transactions</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" id="exportBtn">Export</button>
+                        <button class="btn btn-primary" id="filterBtn">Filter</button>
+                        <a href="#" class="view-all">View All Transactions</a>
+                    </div>
+                </div>
+                <table class="transaction-table" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <!-- Transactions will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Account Management -->
+            <div class="detail-card">
+                <h3><i class="fas fa-tools"></i> Account Management</h3>
+                <div class="btn-group" style="margin-top: 1rem;">
+                    <button class="btn btn-primary" id="updateAddressBtn">Update Address</button>
+                    <button class="btn btn-secondary" id="updateContactBtn">Update Contact Info</button>
+                    <button class="btn btn-warning" id="orderChecksBtn">Order New Checks</button>
+                    <button class="btn btn-secondary" id="stopPaymentBtn">Stop Payment</button>
+                    <button class="btn btn-danger" id="closeAccountBtn">Close Account</button>
+                </div>
+                <div class="info-box" style="margin-top: 1.5rem;">
+                    <h4><i class="fas fa-shield-alt"></i> Security Note</h4>
+                    <p>Your account is protected by PNC's Security Assurance. We monitor your account 24/7 for suspicious activity. Never share your account details, passwords, or security codes with anyone.</p>
+                </div>
+            </div>
+
+            <!-- International Transfer History -->
+            <div class="transactions-card">
+                <div class="transactions-header">
+                    <h3><i class="fas fa-globe-americas"></i> Recent International Transfers</h3>
+                    <a href="dashboard.html#international" class="btn btn-warning">New International Transfer</a>
+                </div>
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Recipient</th>
+                            <th>Country</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="intlTransfersBody">
+                        <!-- International transfers will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Update Address Modal -->
+    <div id="addressModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-home"></i> Update Address</h3>
+            <div class="form-group">
+                <label for="streetAddress">Street Address</label>
+                <input type="text" class="form-control" id="streetAddress" placeholder="123 Main St">
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" class="form-control" id="city" placeholder="New York">
+            </div>
+            <div class="form-group">
+                <label for="state">State</label>
+                <select class="form-control" id="state">
+                    <option value="NY">New York</option>
+                    <option value="CA">California</option>
+                    <option value="TX">Texas</option>
+                    <option value="FL">Florida</option>
+                    <option value="PA">Pennsylvania</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="zipCode">ZIP Code</label>
+                <input type="text" class="form-control" id="zipCode" placeholder="10001">
+            </div>
+            <div class="form-actions">
+                <button id="cancelAddress" class="btn btn-secondary">Cancel</button>
+                <button id="saveAddress" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-mobile-alt"></i> Mobile Deposit</h3>
+            <div class="form-group">
+                <label>Select Account</label>
+                <select class="form-control" id="depositAccount">
+                    <option value="virtual">Virtual Wallet (••••7890)</option>
+                    <option value="savings">Savings Account (••••4567)</option>
+                    <option value="grant">Grant Funds (••••1234)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" class="form-control" id="depositAmount" min="0.01" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Check Front Image</label>
+                <input type="file" id="checkFront" accept="image/*" capture="camera">
+            </div>
+            <div class="form-group">
+                <label>Check Back Image</label>
+                <input type="file" id="checkBack" accept="image/*" capture="camera">
+            </div>
+            <div class="form-actions">
+                <button id="cancelDeposit" class="btn btn-secondary">Cancel</button>
+                <button id="confirmDeposit" class="btn btn-primary">Submit Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Close Account Warning Modal -->
+    <div id="closeAccountModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--error-red);"><i class="fas fa-exclamation-triangle"></i> Close Account</h3>
+            <div class="info-box" style="background-color: #ffe6e6; border-left-color: var(--error-red);">
+                <h4>Important Warning</h4>
+                <p>Closing your account is a permanent action. Please consider the following:</p>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>All recurring payments will need to be redirected</li>
+                    <li>Any pending transactions will be canceled</li>
+                    <li>Account history will be archived but accessible for 7 years</li>
+                    <li>You cannot reopen a closed account</li>
+                </ul>
+            </div>
+            <div class="form-group">
+                <label for="closeReason">Reason for Closing</label>
+                <select class="form-control" id="closeReason">
+                    <option value="">Select a reason</option>
+                    <option value="moving">Moving to another bank</option>
+                    <option value="consolidating">Consolidating accounts</option>
+                    <option value="dissatisfied">Dissatisfied with service</option>
+                    <option value="other">Other reason</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transferToAccount">Transfer remaining balance to:</label>
+                <select class="form-control" id="transferToAccount">
+                    <option value="">Select account</option>
+                    <option value="virtual">Virtual Wallet (••••7890)</option>
+                    <option value="savings">Savings Account (••••4567)</option>
+                    <option value="grant">Grant Funds (••••1234)</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button id="cancelClose" class="btn btn-secondary">Cancel</button>
+                <button id="confirmClose" class="btn btn-danger">Close Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Account data - would normally come from localStorage or API
+        const ACCOUNT_DATA = {
+            virtual: {
+                id: 'virtual',
+                name: 'Virtual Wallet',
+                number: '••••7890',
+                fullNumber: 'XXXX-XXXX-XXXX-7890',
+                balance: 50000.00,
+                availableBalance: 50000.00,
+                type: 'Checking',
+                status: 'Active',
+                openDate: 'January 15, 2020',
+                interestRate: '0.01%',
+                monthlyFee: '$0.00'
+            },
+            savings: {
+                id: 'savings',
+                name: 'Savings Account',
+                number: '••••4567',
+                fullNumber: 'XXXX-XXXX-XXXX-4567',
+                balance: 50000.00,
+                availableBalance: 50000.00,
+                type: 'Savings',
+                status: 'Active',
+                openDate: 'March 22, 2021',
+                interestRate: '0.05%',
+                monthlyFee: '$0.00'
+            },
+            grant: {
+                id: 'grant',
+                name: 'Grant Funds',
+                number: '••••1234',
+                fullNumber: 'XXXX-XXXX-XXXX-1234',
+                balance: 600000.00,
+                availableBalance: 600000.00,
+                type: 'Money Market',
+                status: 'Active',
+                openDate: 'November 5, 2022',
+                interestRate: '0.15%',
+                monthlyFee: '$25.00'
+            }
+        };
+
+        // Sample transactions data
+        const SAMPLE_TRANSACTIONS = [
+            { id: 1, date: '2023-10-15', description: 'Amazon Purchase', category: 'Shopping', amount: -89.99, status: 'Completed', account: 'virtual' },
+            { id: 2, date: '2023-10-14', description: 'Direct Deposit', category: 'Income', amount: 2500.00, status: 'Completed', account: 'virtual' },
+            { id: 3, date: '2023-10-13', description: 'Utility Payment', category: 'Bills', amount: -120.50, status: 'Completed', account: 'virtual' },
+            { id: 4, date: '2023-10-12', description: 'ATM Withdrawal', category: 'Cash', amount: -100.00, status: 'Completed', account: 'virtual' },
+            { id: 5, date: '2023-10-11', description: 'International Transfer', category: 'Transfer', amount: -1000.00, status: 'Pending', account: 'virtual' },
+            { id: 6, date: '2023-10-10', description: 'Grocery Store', category: 'Food', amount: -75.25, status: 'Completed', account: 'virtual' },
+            { id: 7, date: '2023-10-09', description: 'Interest Earned', category: 'Interest', amount: 5.25, status: 'Completed', account: 'virtual' },
+            { id: 8, date: '2023-10-08', description: 'Mobile Deposit', category: 'Deposit', amount: 500.00, status: 'Completed', account: 'virtual' }
+        ];
+
+        // International transfers
+        const INTL_TRANSFERS = [
+            { id: 1, date: '2023-10-05', recipient: 'Chung Keat', country: 'Singapore', amount: 1000.00, status: 'Completed' },
+            { id: 2, date: '2023-09-28', recipient: 'Chung Keat', country: 'Singapore', amount: 2500.00, status: 'Completed' },
+            { id: 3, date: '2023-09-15', recipient: 'Chung Keat', country: 'Singapore', amount: 1500.00, status: 'Completed' }
+        ];
+
+        // Utility functions
+        function formatCurrency(amount) {
+            const num = Number(amount);
+            if (isNaN(num)) return "$0.00";
+
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        function getStatusClass(status) {
+            switch(status.toLowerCase()) {
+                case 'completed': return 'status-completed';
+                case 'pending': return 'status-pending';
+                case 'failed': return 'status-failed';
+                default: return 'status-completed';
+            }
+        }
+
+        // Get account from URL parameter
+        function getAccountFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const accountId = urlParams.get('account') || 'virtual';
+            return accountId;
+        }
+
+        // Load account details
+        function loadAccountDetails() {
+            const accountId = getAccountFromURL();
+            const account = ACCOUNT_DATA[accountId] || ACCOUNT_DATA.virtual;
+            
+            // Update account header
+            const header = document.getElementById('accountDetailHeader');
+            header.innerHTML = `
+                <div class="account-info">
+                    <h2>${account.name}</h2>
+                    <div class="account-number">Account ending in ${account.number}</div>
+                    <span class="account-status status-active">${account.status}</span>
+                </div>
+                <div class="account-balance">
+                    ${formatCurrency(account.balance)}
+                    <small>Available Balance</small>
+                </div>
+            `;
+            
+            // Update account information
+            document.getElementById('accountType').textContent = account.type;
+            document.getElementById('fullAccountNumber').textContent = account.fullNumber;
+            document.getElementById('availableBalance').textContent = formatCurrency(account.availableBalance);
+            document.getElementById('currentBalance').textContent = formatCurrency(account.balance);
+        }
+
+        // Load transactions
+        function loadTransactions() {
+            const accountId = getAccountFromURL();
+            const tbody = document.getElementById('transactionsBody');
+            tbody.innerHTML = '';
+            
+            // Filter transactions for this account
+            const accountTransactions = SAMPLE_TRANSACTIONS.filter(tx => tx.account === accountId);
+            
+            if (accountTransactions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-history" style="font-size: 2rem; color: #ccc; margin-bottom: 1rem;"></i>
+                            <p>No transactions found for this account</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            accountTransactions.forEach(tx => {
+                const row = document.createElement('tr');
+                const amountClass = tx.amount > 0 ? 'positive' : 'negative';
+                const amountSign = tx.amount > 0 ? '+' : '';
+                
+                row.innerHTML = `
+                    <td>${formatDate(tx.date)}</td>
+                    <td>${tx.description}</td>
+                    <td>${tx.category}</td>
+                    <td class="${amountClass}">${amountSign}${formatCurrency(tx.amount)}</td>
+                    <td><span class="transaction-status ${getStatusClass(tx.status)}">${tx.status}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load international transfers
+        function loadInternationalTransfers() {
+            const tbody = document.getElementById('intlTransfersBody');
+            tbody.innerHTML = '';
+            
+            INTL_TRANSFERS.forEach(transfer => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatDate(transfer.date)}</td>
+                    <td>${transfer.recipient}</td>
+                    <td>${transfer.country}</td>
+                    <td class="negative">-${formatCurrency(transfer.amount)}</td>
+                    <td><span class="transaction-status status-completed">${transfer.status}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Setup modals and buttons
+        function setupEventListeners() {
+            // Mobile menu
+            const hamburger = document.getElementById('hamburger');
+            const sidebar = document.getElementById('sidebar');
+            
+            hamburger.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function (event) {
+                if (window.innerWidth <= 768) {
+                    const isClickInsideSidebar = sidebar.contains(event.target);
+                    const isClickOnHamburger = hamburger.contains(event.target);
+                    
+                    if (!isClickInsideSidebar && !isClickOnHamburger) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                if (confirm('Are you sure you want to sign out?')) {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Update Address Modal
+            const addressModal = document.getElementById('addressModal');
+            const updateAddressBtn = document.getElementById('updateAddressBtn');
+            const cancelAddressBtn = document.getElementById('cancelAddress');
+            const saveAddressBtn = document.getElementById('saveAddress');
+            
+            updateAddressBtn.addEventListener('click', function() {
+                addressModal.style.display = 'flex';
+            });
+            
+            cancelAddressBtn.addEventListener('click', function() {
+                addressModal.style.display = 'none';
+            });
+            
+            saveAddressBtn.addEventListener('click', function() {
+                // In a real app, this would send data to server
+                alert('Address updated successfully!');
+                addressModal.style.display = 'none';
+            });
+            
+            // Deposit Modal
+            const depositModal = document.getElementById('depositModal');
+            const depositBtn = document.getElementById('depositBtn');
+            const cancelDepositBtn = document.getElementById('cancelDeposit');
+            
+            depositBtn.addEventListener('click', function() {
+                depositModal.style.display = 'flex';
+            });
+            
+            cancelDepositBtn.addEventListener('click', function() {
+                depositModal.style.display = 'none';
+            });
+            
+            // Close Account Modal
+            const closeAccountModal = document.getElementById('closeAccountModal');
+            const closeAccountBtn = document.getElementById('closeAccountBtn');
+            const cancelCloseBtn = document.getElementById('cancelClose');
+            
+            closeAccountBtn.addEventListener('click', function() {
+                closeAccountModal.style.display = 'flex';
+            });
+            
+            cancelCloseBtn.addEventListener('click', function() {
+                closeAccountModal.style.display = 'none';
+            });
+            
+            // Quick action buttons
+            document.getElementById('transferBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'transfer.html';
+            });
+            
+            document.getElementById('payBillBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'paybills.html';
+            });
+            
+            document.getElementById('statementBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Statement generation started. You will receive an email when your statement is ready.');
+            });
+            
+            // Export transactions
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                alert('Transactions exported successfully in CSV format.');
+            });
+            
+            // Filter transactions
+            document.getElementById('filterBtn').addEventListener('click', function() {
+                alert('Filter options would appear here in a real application.');
+            });
+            
+            // Close modals when clicking outside
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Initialize the page
+        function initPage() {
+            loadAccountDetails();
+            loadTransactions();
+            loadInternationalTransfers();
+            setupEventListeners();
+            
+            // Update account name in page title
+            const accountId = getAccountFromURL();
+            const account = ACCOUNT_DATA[accountId] || ACCOUNT_DATA.virtual;
+            document.title = `PNC Bank | ${account.name} Details`;
+        }
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
