@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Details | PNC Bank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #003366;
+            --accent-orange: #FF8200;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+            --white: #FFFFFF;
+            --success-green: #28a745;
+            --error-red: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .dashboard-header {
+            background-color: var(--white);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 30px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .details-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .account-header {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-info h2 {
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .account-balance {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .account-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .transaction-history {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transaction-table th,
+        .transaction-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-table th {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .positive {
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .negative {
+            color: var(--error-red);
+            font-weight: 600;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-btn i {
+            margin-right: 5px;
+        }
+
+        /* Mobile-specific transaction styles */
+        @media (max-width: 768px) {
+            .account-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .account-balance {
+                margin-top: 1rem;
+                text-align: left;
+            }
+
+            .transaction-table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .transaction-table thead {
+                display: none;
+            }
+
+            .transaction-table tbody {
+                display: block;
+                width: 100%;
+            }
+
+            .transaction-table tr {
+                display: block;
+                padding: 1rem 0;
+                border-bottom: 1px solid #eee;
+            }
+
+            .transaction-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                text-align: right;
+                border: none;
+            }
+
+            .transaction-table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: var(--primary-blue);
+                margin-right: 1rem;
+                text-align: left;
+            }
+
+            .transaction-table td:last-child {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="logo">
+            <img src="PNC-Bank-Logo.jpg" alt="PNC Bank Logo">
+            <span>PNC Online Banking</span>
+        </div>
+        <div class="header-controls">
+            <div class="user-avatar">JR</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="details-container">
+        <a href="dashboard.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <div class="account-header">
+            <div class="account-info">
+                <h2 id="account-name">Checking Account</h2>
+                <div class="account-meta">
+                    <span id="account-number">••••7890</span>
+                    <span id="account-status"> • Active</span>
+                </div>
+            </div>
+            <div class="account-balance" id="account-balance">$12,345.67</div>
+        </div>
+
+        <div class="transaction-history">
+            <h3>Transaction History</h3>
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions-body">
+                    <!-- Transactions will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Get account type from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const accountType = urlParams.get('account') || 'virtual';
+
+        // Format currency
+        function formatCurrency(amount) {
+            const num = Number(amount);
+            if (isNaN(num)) return "$0.00";
+            
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Load account details
+        function loadAccountDetails() {
+            const accounts = JSON.parse(localStorage.getItem('accounts')) || {};
+            const account = accounts[accountType];
+            
+            if (account) {
+                document.getElementById('account-name').textContent = account.name;
+                document.getElementById('account-number').textContent = `Account ending in ${account.number}`;
+                document.getElementById('account-balance').textContent = formatCurrency(account.balance);
+                
+                const statusElement = document.getElementById('account-status');
+                statusElement.textContent = account.status ? ` • ${account.status}` : '';
+                statusElement.style.color = account.status === 'Active' ? 'var(--success-green)' : 'inherit';
+            }
+        }
+
+        // Load transactions for this account
+        function loadTransactions() {
+            const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+            const tbody = document.getElementById('transactions-body');
+            tbody.innerHTML = '';
+
+            // Filter and sort transactions
+            const accountTransactions = transactions
+                .filter(tx => tx.account === accountType)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (accountTransactions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">No transactions found</td></tr>`;
+                return;
+            }
+
+            accountTransactions.forEach(tx => {
+                const row = document.createElement('tr');
+                const amount = Number(tx.amount);
+                const isPositive = amount > 0;
+
+                row.innerHTML = `
+                    <td data-label="Date">${formatDate(tx.date)}</td>
+                    <td data-label="Description">${tx.description || 'Transaction'}</td>
+                    <td data-label="Amount" class="${isPositive ? 'positive' : 'negative'}">
+                        ${isPositive ? '+' : ''}${formatCurrency(amount)}
+                    </td>
+                    <td data-label="Status">${tx.status || 'Completed'}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Initialize the page
+        function initPage() {
+            loadAccountDetails();
+            loadTransactions();
+        }
+
+        // Run when page loads
+        window.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PNC Bank | Transfer Funds</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary-blue: #003366;
+  --accent-orange: #FF8200;
+  --light-gray: #F5F5F5;
+  --dark-gray: #333333;
+  --white: #FFFFFF;
+  --success-green: #28a745;
+  --error-red: #dc3545;
+  --chime-green: #10b981;
+  --chime-light-green: #d1fae5;
+  --pnc-blue: #004B8D;
+  --pnc-light-blue: #e6f0f7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--light-gray);
+  color: var(--dark-gray);
+  line-height: 1.6;
+}
+
+.dashboard-header {
+  background-color: var(--white);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  height: 30px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--primary-blue);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.hamburger {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--primary-blue);
+  cursor: pointer;
+  padding: 5px;
+}
+
+.dashboard-container {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.sidebar {
+  width: 0;
+  background-color: var(--primary-blue);
+  color: white;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  height: calc(100vh - 60px);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.active {
+  width: 250px;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 1.5rem 0;
+  flex: 1;
+}
+
+.sidebar-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1.5rem;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu li a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu li a.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-menu i {
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-signout {
+  background-color: transparent;
+  color: white;
+  text-align: left;
+  padding: 0.8rem 1.5rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-signout:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.main-content {
+  flex: 1;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.transfer-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.transfer-header {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.transfer-header h2 {
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+}
+
+.transfer-form {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary-blue);
+  outline: none;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-col {
+  flex: 1;
+}
+
+.account-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-option {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.account-option:hover {
+  border-color: var(--primary-blue);
+}
+
+.account-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.account-option input[type="radio"]:checked + .account-info {
+  color: var(--primary-blue);
+}
+
+.account-info {
+  pointer-events: none;
+}
+
+.account-name {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.account-number {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.account-balance {
+  font-size: 0.9rem;
+  color: var(--primary-blue);
+}
+
+.btn {
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: var(--primary-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #002b57;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.btn-outline:hover {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+/* REVIEW MODAL STYLES */
+.review-details {
+  background: var(--light-gray);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.review-detail-row {
+  display: flex;
+  flex-direction: column;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.review-detail-row:last-child {
+  border-bottom: none;
+}
+
+.review-detail-label {
+  color: #666;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.review-detail-value {
+  font-weight: 600;
+  font-size: 1rem;
+  word-break: break-word;
+}
+
+.review-amount {
+  text-align: center;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  margin: 1rem 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.review-amount .amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.review-amount .label {
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.review-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.disclaimer {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  color: #856404;
+}
+
+.disclaimer i {
+  margin-right: 0.5rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0);
+}
+
+.modal-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.modal-header h3 {
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+}
+
+.verification-code {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 1.5rem 0;
+}
+
+.verification-code input {
+  width: 50px;
+  height: 60px;
+  text-align: center;
+  font-size: 1.5rem;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+}
+
+.verification-code input:focus {
+  border-color: var(--primary-blue);
+  outline: none;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.modal-footer.dual-buttons {
+  justify-content: space-between;
+}
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255,255,255,0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.loading-screen.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid var(--primary-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* FIXED SUCCESS SCREEN STYLES */
+.success-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  z-index: 1200;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.success-screen.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.success-card {
+  background: white;
+  border-radius: 12px;
+  width: calc(100% - 2rem);
+  max-width: 700px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  overflow: hidden;
+  animation: slideUp 0.6s ease-out;
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  max-height: calc(100vh - 2rem);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #004d99 100%);
+  color: white;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.success-header:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="white" opacity="0.1"/></svg>');
+  background-size: cover;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 1rem;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.success-icon i {
+  color: var(--success-green);
+  font-size: 1.8rem;
+  animation: scaleIn 0.5s ease-out 0.2s both;
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.success-header h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+  line-height: 1.3;
+}
+
+.success-header p {
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.success-body {
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.receipt-details {
+  background: var(--light-gray);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: #666;
+  font-weight: 500;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.detail-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.amount-display {
+  text-align: center;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.amount-display .amount {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.amount-display .label {
+  color: #666;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.transfer-timeline {
+  padding: 1rem 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  margin-top: 1rem;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.8rem 0;
+}
+
+.timeline-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--light-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.timeline-icon.completed {
+  background: var(--success-green);
+  color: white;
+}
+
+.timeline-icon.pending {
+  background: var(--accent-orange);
+  color: white;
+}
+
+.timeline-content h4 {
+  margin-bottom: 0.2rem;
+  font-size: 0.9rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.timeline-content p {
+  color: #666;
+  font-size: 0.8rem;
+  text-align: left;
+  line-height: 1.3;
+}
+
+.success-footer {
+  padding: 1.5rem 1rem;
+  background: var(--light-gray);
+  border-top: 1px solid rgba(0,0,0,0.1);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.reference-number {
+  font-family: 'Courier New', monospace;
+  background: white;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: var(--primary-blue);
+  border: 1px solid rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+  word-break: break-all;
+  letter-spacing: 0.5px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    width: 250px;
+    position: static;
+    height: auto;
+  }
+  
+  .main-content {
+    width: calc(100% - 250px);
+  }
+  
+  .hamburger {
+    display: none;
+  }
+  
+  /* Desktop styles for success screen */
+  .success-card {
+    margin: 0;
+    max-height: 90vh;
+  }
+  
+  .success-header {
+    padding: 2rem;
+  }
+  
+  .success-header h2 {
+    font-size: 2rem;
+  }
+  
+  .success-icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .success-icon i {
+    font-size: 2.5rem;
+  }
+  
+  .success-body {
+    padding: 2.5rem;
+    max-height: 60vh;
+  }
+  
+  .amount-display .amount {
+    font-size: 3rem;
+  }
+  
+  .detail-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  .detail-label {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    width: 40%;
+    text-align: left;
+  }
+  
+  .detail-value {
+    font-size: 1rem;
+    text-align: right;
+    width: 60%;
+  }
+  
+  .action-buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .btn-outline {
+    min-width: 150px;
+  }
+  
+  .review-detail-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .review-detail-label {
+    margin-bottom: 0;
+    width: 40%;
+  }
+  
+  .review-detail-value {
+    width: 60%;
+    text-align: right;
+  }
+}
+
+/* Custom dropdown styles */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-toggle {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.dropdown-toggle:hover {
+  border-color: var(--primary-blue);
+}
+
+.dropdown-toggle .selected-bank {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bank-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 3px;
+  background-color: white;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-item .bank-logo {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #eee;
+}
+
+.dropdown-item .bank-name {
+  flex: 1;
+}
+
+/* New styles for verification animation */
+.verification-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem 0;
+  min-height: 100px;
+}
+
+.verification-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--primary-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.verification-progress {
+  width: 100%;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.verification-progress-bar {
+  height: 100%;
+  background-color: var(--success-green);
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.verification-status {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  min-height: 24px;
+}
+
+.verified-account {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  border-left: 4px solid var(--success-green);
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verified-account p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.checkmark {
+  color: var(--success-green);
+  animation: popIn 0.3s ease-out 0.5s both;
+}
+
+/* PNC Bank specific styling */
+.pnc-verified {
+  background-color: var(--pnc-light-blue);
+  border-left-color: var(--pnc-blue);
+}
+
+.pnc-verified .checkmark {
+  color: var(--pnc-blue);
+}
+
+/* For PNC logo in dropdown */
+.pnc-logo {
+  background-color: var(--pnc-blue);
+  padding: 2px;
+}
+
+/* Updated bank options with PNC */
+.bank-option-pnc {
+  background-color: var(--pnc-light-blue);
+  border-left: 4px solid var(--pnc-blue);
+}
+
+.bank-option-pnc:hover {
+  background-color: #d0e4f2;
+}
+
+/* Mobile-specific adjustments for success screen */
+@media (max-width: 767px) {
+  .success-card {
+    margin: 0.5rem;
+    max-height: calc(100vh - 1rem);
+  }
+  
+  .success-body {
+    padding: 1rem;
+    max-height: 50vh;
+  }
+  
+  .amount-display .amount {
+    font-size: 1.8rem;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<header class="dashboard-header">
+<div class="logo">
+<img src="PNC-Bank-Logo.jpg" alt="PNC Bank Logo">
+<span>PNC Online Banking</span>
+</div>
+<div class="header-controls">
+<div class="user-avatar">CT</div>
+<button class="hamburger" id="hamburger">
+<i class="fas fa-bars"></i>
+</button>
+</div>
+</header>
+
+<div class="dashboard-container">
+<aside class="sidebar" id="sidebar">
+<ul class="sidebar-menu">
+<li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+<li><a href="dashboard.html"><i class="fas fa-wallet"></i> Accounts</a></li>
+<li><a href="transfer.html" class="active"><i class="fas fa-exchange-alt"></i> Transfer</a></li>
+<li><a href="paybills.html"><i class="fas fa-money-bill-wave"></i> Pay Bills</a></li>
+<li><a href="cards.html"><i class="fas fa-credit-card"></i> Cards</a></li>
+<li><a href="investment.html"><i class="fas fa-chart-line"></i> Investments</a></li>
+<li><a href="savingsgoal.html"><i class="fas fa-piggy-bank"></i> Savings Goals</a></li>
+<li><a href="messages.html"><i class="fas fa-envelope"></i> Messages</a></li>
+<li><a href="statement.html"><i class="fas fa-file-invoice-dollar"></i> Statements</a></li>
+<li><a href="security.html"><i class="fas fa-user-shield"></i> Security</a></li>
+<li><a href="help.html"><i class="fas fa-question-circle"></i> Help</a></li>
+</ul>
+
+<div class="sidebar-footer">
+<button class="btn-signout" id="logoutBtn">
+<i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i>
+Sign Out
+</button>
+</div>
+</aside>
+
+<main class="main-content">
+<div class="transfer-container">
+<div class="transfer-header">
+<h2>Transfer Funds</h2>
+<p>Move money between your PNC accounts or to external accounts</p>
+</div>
+
+<form class="transfer-form" id="transferForm">
+<div class="form-group">
+<label>Transfer Type</label>
+<select class="form-control" id="transferType">
+<option value="internal">Between My PNC Accounts</option>
+<option value="external">To Another Bank Account</option>
+<option value="pnc">To Another PNC Customer</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>From Account</label>
+<div class="account-selector">
+<label class="account-option" for="from-virtual">
+<input type="radio" id="from-virtual" name="fromAccount" value="virtual" checked>
+<div class="account-info">
+<div class="account-name">Virtual Wallet</div>
+<div class="account-number">••••7890</div>
+<div class="account-balance" id="from-virtual-balance">Available: $5,750.00</div>
+</div>
+</label>
+<label class="account-option" for="from-savings">
+<input type="radio" id="from-savings" name="fromAccount" value="savings">
+<div class="account-info">
+<div class="account-name">Savings Account</div>
+<div class="account-number">••••4567</div>
+<div class="account-balance" id="from-savings-balance">Available: $5,750.00</div>
+</div>
+</label>
+<label class="account-option" for="from-grant">
+<input type="radio" id="from-grant" name="fromAccount" value="grant">
+<div class="account-info">
+<div class="account-name">Grant Funds</div>
+<div class="account-number">••••1234</div>
+<div class="account-balance" id="from-grant-balance">Available: $570,000.00</div>
+</div>
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label>To Account</label>
+<div class="account-selector" id="internalAccounts">
+<label class="account-option" for="to-virtual">
+<input type="radio" id="to-virtual" name="toAccount" value="virtual">
+<div class="account-info">
+<div class="account-name">Virtual Wallet</div>
+<div class="account-number">••••7890</div>
+</div>
+</label>
+<label class="account-option" for="to-savings">
+<input type="radio" id="to-savings" name="toAccount" value="savings" checked>
+<div class="account-info">
+<div class="account-name">Savings Account</div>
+<div class="account-number">••••4567</div>
+</div>
+</label>
+<label class="account-option" for="to-grant">
+<input type="radio" id="to-grant" name="toAccount" value="grant">
+<div class="account-info">
+<div class="account-name">Grant Funds</div>
+<div class="account-number">••••1234</div>
+</div>
+</label>
+</div>
+
+<div id="externalAccountFields" style="display: none;">
+<div class="form-group">
+<label>Bank Name</label>
+<div class="custom-dropdown" id="bankDropdown">
+<div class="dropdown-toggle" id="bankToggle">
+<div class="selected-bank">
+<span>Select Bank</span>
+</div>
+<i class="fas fa-chevron-down"></i>
+</div>
+<div class="dropdown-menu" id="bankMenu">
+<!-- Bank options will be added here by JavaScript -->
+</div>
+<input type="hidden" id="selectedBank" value="">
+</div>
+</div>
+<div class="form-group">
+<label>Account Number</label>
+<input type="text" class="form-control" id="externalAccountNumber" placeholder="Enter account number">
+</div>
+<div class="form-group">
+<label>Routing Number</label>
+<input type="text" class="form-control" id="routingNumber" placeholder="Enter Routing Number">
+<small style="color: #666; display: block; margin-top: 0.5rem;">The routing number is 9 digits long</small>
+</div>
+
+<!-- Verification Animation Container -->
+<div class="form-group" id="verificationAnimation" style="display: none;">
+<div class="verification-animation">
+<div class="verification-spinner"></div>
+<div class="verification-progress">
+<div class="verification-progress-bar"></div>
+</div>
+<div class="verification-status" id="verificationStatus">
+Verifying account details...
+</div>
+</div>
+</div>
+
+<!-- Verified Account Container -->
+<div class="form-group" id="verifiedAccountContainer" style="display: none;">
+<label>Verified Account Name</label>
+<div class="verified-account" id="verifiedAccountDiv">
+<p><i class="fas fa-check-circle checkmark"></i> <span id="verifiedAccountName">Account Holder Name</span></p>
+</div>
+</div>
+</div>
+
+<!-- PNC Customer Transfer Fields -->
+<div id="pncAccountFields" style="display: none;">
+<div class="form-group">
+<label>Routing Number</label>
+<input type="text" class="form-control" id="pncRoutingNumber" placeholder="">
+<small style="color: #666; display: block; margin-top: 0.5rem;">Enter PNC Bank routing number (usually 043000096)</small>
+</div>
+<div class="form-group">
+<label>Account Number</label>
+<input type="text" class="form-control" id="pncAccountNumber" placeholder="Enter recipient's PNC account number">
+</div>
+
+<!-- Verification Animation Container for PNC -->
+<div class="form-group" id="pncVerificationAnimation" style="display: none;">
+<div class="verification-animation">
+<div class="verification-spinner"></div>
+<div class="verification-progress">
+<div class="verification-progress-bar"></div>
+</div>
+<div class="verification-status" id="pncVerificationStatus">
+Verifying PNC account details...
+</div>
+</div>
+</div>
+
+<!-- Verified PNC Account Container -->
+<div class="form-group" id="pncVerifiedAccountContainer" style="display: none;">
+<label>Verified Account Name</label>
+<div class="verified-account pnc-verified" id="pncVerifiedAccountDiv">
+<p><i class="fas fa-check-circle checkmark"></i> <span id="pncVerifiedAccountName">PNC Account Holder</span></p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="form-group">
+<label>Amount</label>
+<div class="form-row">
+<div class="form-col">
+<input type="number" class="form-control" id="amount" placeholder="0.00" min="0.01" step="0.01">
+</div>
+<div class="form-col">
+<select class="form-control" id="frequency">
+<option value="once">One-time transfer</option>
+<option value="recurring">Recurring transfer</option>
+</select>
+</div>
+</div>
+</div>
+
+<div class="form-group" id="recurringOptions" style="display: none;">
+<label>Recurrence</label>
+<div class="form-row">
+<div class="form-col">
+<select class="form-control" id="recurrenceFrequency">
+<option value="weekly">Weekly</option>
+<option value="biweekly">Bi-weekly</option>
+<option value="monthly">Monthly</option>
+</select>
+</div>
+<div class="form-col">
+<input type="date" class="form-control" id="startDate">
+</div>
+</div>
+</div>
+
+<div class="form-group">
+<label for="description">Description (Optional)</label>
+<input type="text" class="form-control" id="description" placeholder="Enter description">
+</div>
+
+<div class="form-group">
+<button type="submit" class="btn btn-primary btn-block">Review Transfer</button>
+</div>
+</form>
+</div>
+</main>
+</div>
+
+<!-- Review Transfer Modal -->
+<div class="modal-overlay" id="reviewModal">
+<div class="modal-content">
+<div class="modal-header">
+<h3>Review Your Transfer</h3>
+<p>Please verify the details before proceeding</p>
+</div>
+
+<div class="review-amount">
+<div class="amount" id="reviewAmount">$0.00</div>
+<div class="label">Transfer Amount</div>
+</div>
+
+<div class="review-details">
+<div class="review-detail-row">
+<div class="review-detail-label">From Account</div>
+<div class="review-detail-value" id="reviewFrom">-</div>
+</div>
+<div class="review-detail-row">
+<div class="review-detail-label">To Account</div>
+<div class="review-detail-value" id="reviewTo">-</div>
+</div>
+<div class="review-detail-row">
+<div class="review-detail-label">Transfer Type</div>
+<div class="review-detail-value" id="reviewType">-</div>
+</div>
+<div class="review-detail-row">
+<div class="review-detail-label">Recipient Name</div>
+<div class="review-detail-value" id="reviewRecipient">-</div>
+</div>
+<div class="review-detail-row">
+<div class="review-detail-label">Transfer Date</div>
+<div class="review-detail-value" id="reviewDate">-</div>
+</div>
+<div class="review-detail-row">
+<div class="review-detail-label">Description</div>
+<div class="review-detail-value" id="reviewDescription">-</div>
+</div>
+</div>
+
+<div class="disclaimer">
+<i class="fas fa-info-circle"></i>
+<span>Transfers to external banks typically take 1-3 business days. PNC-to-PNC transfers are usually instant.</span>
+</div>
+
+<div class="review-footer">
+<div class="modal-footer dual-buttons">
+<button type="button" class="btn btn-secondary" id="editTransfer">Edit Details</button>
+<button type="button" class="btn btn-primary" id="confirmReview">Confirm & Continue</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- PIN Verification Modal -->
+<div class="modal-overlay" id="verificationModal">
+<div class="modal-content">
+<div class="modal-header">
+<h3>Verify Your Transfer</h3>
+<p>Please enter your transfer PIN to proceed</p>
+</div>
+<form id="verificationForm">
+<div class="form-group">
+<label>Enter your 4-digit PIN</label>
+<div class="verification-code">
+<input type="text" maxlength="1" pattern="[0-9]" required>
+<input type="text" maxlength="1" pattern="[0-9]" required>
+<input type="text" maxlength="1" pattern="[0-9]" required>
+<input type="text" maxlength="1" pattern="[0-9]" required>
+</div>
+</div>
+<div class="modal-footer">
+<button type="button" class="btn btn-secondary" id="cancelTransfer">Cancel</button>
+<button type="submit" class="btn btn-primary">Confirm Transfer</button>
+</div>
+</form>
+</div>
+</div>
+
+<div class="loading-screen" id="loadingScreen">
+<div class="loading-spinner"></div>
+<h3>Processing Your Transfer</h3>
+<p>Please wait while we complete your transaction</p>
+</div>
+
+<div class="success-screen" id="successScreen">
+<div class="success-card">
+<div class="success-header">
+<div class="success-icon">
+<i class="fas fa-check"></i>
+</div>
+<h2>Transfer Successful!</h2>
+<p>Your funds have been transferred successfully</p>
+</div>
+
+<div class="success-body">
+<div class="amount-display">
+<div class="amount" id="successAmount">$100.00</div>
+<div class="label">AMOUNT TRANSFERRED</div>
+</div>
+
+<div class="receipt-details">
+<div class="detail-row">
+<div class="detail-label">FROM ACCOUNT</div>
+<div class="detail-value" id="successFrom">Grant Funds (•••••1234)</div>
+</div>
+<div class="detail-row">
+<div class="detail-label">TO ACCOUNT</div>
+<div class="detail-value" id="successTo">Sarah Johnson (•••••1824)</div>
+</div>
+<div class="detail-row">
+<div class="detail-label">RECIPIENT BANK</div>
+<div class="detail-value" id="successBank">PNC Bank</div>
+</div>
+<div class="detail-row">
+<div class="detail-label">TRANSFER DATE</div>
+<div class="detail-value" id="successDate">Dec 15, 2023</div>
+</div>
+<div class="detail-row">
+<div class="detail-label">TRANSFER TIME</div>
+<div class="detail-value" id="successTime">2:45 PM EST</div>
+</div>
+<div class="detail-row">
+<div class="detail-label">TRANSFER TYPE</div>
+<div class="detail-value" id="successTransferType">PNC-to-PNC Transfer</div>
+</div>
+<div class="detail-row">
+<div class="detail-label">STATUS</div>
+<div class="detail-value" style="color: var(--success-green); font-weight: 700;">Completed ✓</div>
+</div>
+<div class="detail-row">
+<div class="detail-label">EXPECTED DELIVERY</div>
+<div class="detail-value" id="successDelivery">Immediately</div>
+</div>
+</div>
+
+<div class="transfer-timeline">
+<div class="timeline-item">
+<div class="timeline-icon completed">
+<i class="fas fa-check"></i>
+</div>
+<div class="timeline-content">
+<h4>Transfer Initiated</h4>
+<p>Your transfer request has been submitted</p>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-icon completed">
+<i class="fas fa-check"></i>
+</div>
+<div class="timeline-content">
+<h4>Funds Deducted</h4>
+<p>Amount deducted from your account</p>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-icon completed">
+<i class="fas fa-check"></i>
+</div>
+<div class="timeline-content">
+<h4>Processing Complete</h4>
+<p>Funds delivered to recipient</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="success-footer">
+<div class="reference-number">
+Transaction Reference: <span id="successRef">PNC-TX-987654321</span>
+</div>
+<p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.4;">
+A confirmation email has been sent to your registered email address.<br>
+Save this receipt for your records.
+</p>
+<div class="action-buttons">
+<button class="btn btn-outline" id="printReceipt">
+<i class="fas fa-print"></i> Print Receipt
+</button>
+<button class="btn btn-primary" id="successDone">
+<i class="fas fa-home"></i> Return to Dashboard
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// Account types
+const ACCOUNT_TYPES = {
+  VIRTUAL: 'virtual',
+  SAVINGS: 'savings',
+  GRANT: 'grant'
+};
+
+// Transfer types
+const TRANSFER_TYPES = {
+  INTERNAL: 'internal',
+  EXTERNAL: 'external',
+  PNC: 'pnc'
+};
+
+// PNC Account Database for verification
+const PNC_ACCOUNT_DATABASE = [
+  {
+    accountNumber: "987645772",
+    verifiedName: "CALVIN TUBERGEN",
+    email: "sarah.johnson@email.com",
+    accountType: "Virtual Wallet"
+  },
+  {
+    accountNumber: "987654321",
+    verifiedName: "Michael Anderson",
+    email: "m.anderson@email.com",
+    accountType: "Performance Select"
+  },
+  {
+    accountNumber: "123456789",
+    verifiedName: "Robert Williams",
+    email: "r.williams@email.com",
+    accountType: "Standard Checking"
+  },
+  {
+    accountNumber: "456789123",
+    verifiedName: "Jennifer Martinez",
+    email: "j.martinez@email.com",
+    accountType: "Savings Plus"
+  },
+  {
+    accountNumber: "689149326",
+    verifiedName: "David Brown",
+    email: "david.b@email.com",
+    accountType: "Virtual Wallet"
+  },
+  {
+    accountNumber: "321654987",
+    verifiedName: "Emily Davis",
+    email: "emily.davis@email.com",
+    accountType: "Student Checking"
+  },
+  {
+    accountNumber: "852963741",
+    verifiedName: "James Wilson",
+    email: "j.wilson@email.com",
+    accountType: "Premium Checking"
+  },
+  {
+    accountNumber: "147258369",
+    verifiedName: "Lisa Miller",
+    email: "l.miller@email.com",
+    accountType: "Money Market"
+  },
+  {
+    accountNumber: "369258147",
+    verifiedName: "Thomas Taylor",
+    email: "t.taylor@email.com",
+    accountType: "Virtual Wallet"
+  },
+  {
+    accountNumber: "258369147",
+    verifiedName: "Patricia Moore",
+    email: "p.moore@email.com",
+    accountType: "Retirement Checking"
+  }
+];
+
+// Bank database with logos and verified names
+const BANK_DATABASE = [
+  {
+    name: "PNC Bank",
+    logo: "PNC-Bank-Logo.jpg",
+    routingNumber: "043000096",
+    accountNumber: "753951824",
+    verifiedName: "Sarah Johnson",
+    country: "USA",
+    swiftCode: "PNCCUS33",
+    isPNC: true
+  },
+  {
+    name: "Chime Bank",
+    logo: "chime.png",
+    routingNumber: "103100195",
+    accountNumber: "689149326530",
+    verifiedName: "David Brown",
+    country: "USA",
+    swiftCode: "CHIMEUS33"
+  },
+  {
+    name: "Bank of America",
+    logo: "download.png",
+    routingNumber: "026009593",
+    accountNumber: "987654321",
+    verifiedName: "Michael Anderson",
+    country: "USA"
+  },
+  {
+    name: "Wells Fargo",
+    logo: "download (1).png",
+    routingNumber: "121000248",
+    accountNumber: "456789123",
+    verifiedName: "Jennifer Martinez",
+    country: "USA"
+  },
+  {
+    name: "J.P. Morgan Chase",
+    logo: "download (2).png",
+    routingNumber: "021000021",
+    accountNumber: "5610044373",
+    verifiedName: "Robert W Hall Jr",
+    country: "USA"
+  },
+  {
+    name: "Citibank",
+    logo: "citi bank.png",
+    routingNumber: "021000089",
+    accountNumber: "321654987",
+    verifiedName: "Sarah Johnson",
+    country: "USA"
+  },
+  {
+    name: "U.S. Bank",
+    logo: "us bank.png",
+    routingNumber: "091000022",
+    accountNumber: "654987321",
+    verifiedName: "Robert Williams",
+    country: "USA"
+  },
+  {
+    name: "Truist Bank",
+    logo: "Truist Bank.png",
+    routingNumber: "053100465",
+    accountNumber: "147258369",
+    verifiedName: "Patricia Brown",
+    country: "USA"
+  },
+  {
+    name: "Capital One",
+    logo: "capital.png",
+    routingNumber: "031176110",
+    accountNumber: "369258147",
+    verifiedName: "James Wilson",
+    country: "USA"
+  },
+  {
+    name: "TD Bank",
+    logo: "td bank.png",
+    routingNumber: "031101266",
+    accountNumber: "258369147",
+    verifiedName: "Lisa Miller",
+    country: "USA"
+  },
+  {
+    name: "HSBC Bank",
+    logo: "HSBC Bank.png",
+    routingNumber: "021001088",
+    accountNumber: "852963741",
+    verifiedName: "Richard Davis",
+    country: "USA"
+  },
+  {
+    name: "American Express",
+    logo: "express.png",
+    routingNumber: "124085066",
+    accountNumber: "741963852",
+    verifiedName: "Susan Garcia",
+    country: "USA"
+  },
+  {
+    name: "Ally Bank",
+    logo: "download (3).png",
+    routingNumber: "124003116",
+    accountNumber: "963852741",
+    verifiedName: "Charles Rodriguez",
+    country: "USA"
+  },
+  {
+    name: "Discover Bank",
+    logo: "discover.png",
+    routingNumber: "031100649",
+    accountNumber: "159357486",
+    verifiedName: "Karen Martinez",
+    country: "USA"
+  },
+  {
+    name: "Synchrony Bank",
+    logo: "syndrome.jpg",
+    routingNumber: "021213591",
+    accountNumber: "357159486",
+    verifiedName: "Thomas Lee",
+    country: "USA"
+  },
+  {
+    name: "Charles Schwab Bank",
+    logo: "charles.png",
+    routingNumber: "121202211",
+    accountNumber: "486357159",
+    verifiedName: "Nancy White",
+    country: "USA"
+  },
+  {
+    name: "Goldman Sachs Bank",
+    logo: "golld.png",
+    routingNumber: "026012881",
+    accountNumber: "753951824",
+    verifiedName: "Daniel Harris",
+    country: "USA"
+  },
+  {
+    name: "Morgan Stanley Private Bank",
+    logo: "morgan.jpg",
+    routingNumber: "026008508",
+    accountNumber: "951753824",
+    verifiedName: "Jessica Clark",
+    country: "USA"
+  },
+  {
+    name: "Silicon Valley Bank",
+    logo: "silicon.jpg",
+    routingNumber: "121140399",
+    accountNumber: "824753951",
+    verifiedName: "Paul Lewis",
+    country: "USA"
+  },
+  {
+    name: "First Republic Bank",
+    logo: "first.png",
+    routingNumber: "321081749",
+    accountNumber: "284619735",
+    verifiedName: "Amanda Walker",
+    country: "USA"
+  },
+  {
+    name: "Other Bank",
+    logo: "other.png",
+    routingNumber: "",
+    accountNumber: "",
+    verifiedName: "",
+    country: "Unknown"
+  }
+];
+
+// Initialize accounts from localStorage
+function getAccounts() {
+  const defaultAccounts = {
+    [ACCOUNT_TYPES.VIRTUAL]: {
+      id: ACCOUNT_TYPES.VIRTUAL,
+      name: "Virtual Wallet",
+      number: "••••7890",
+      balance: 5750.00
+    },
+    [ACCOUNT_TYPES.SAVINGS]: {
+      id: ACCOUNT_TYPES.SAVINGS,
+      name: "Savings Account",
+      number: "••••4567",
+      balance: 5750.00
+    },
+    [ACCOUNT_TYPES.GRANT]: {
+      id: ACCOUNT_TYPES.GRANT,
+      name: "Grant Funds",
+      number: "••••1234",
+      balance: 570000.00
+    }
+  };
+
+  try {
+    const storedAccounts = JSON.parse(localStorage.getItem('accounts'));
+    return storedAccounts || defaultAccounts;
+  } catch {
+    return defaultAccounts;
+  }
+}
+
+// Format currency
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(amount);
+}
+
+// Format date for display
+function formatDate(date) {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+// Format time for display
+function formatTime(date) {
+  return new Date(date).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short'
+  });
+}
+
+// Create a generic bank icon as fallback
+function createBankIcon() {
+  return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMiA3TDEyIDEyTDIyIDdMMTIgMloiIGZpbGw9IiMwMDMzNjYiLz4KPHBhdGggZD0iTTIgMTdMMTIgMjJMMjIgMTdMMTIgMTJMMiAxN1oiIGZpbGw9IiMwMDMzNjYiLz4KPC9zdmc+';
+}
+
+// Custom dropdown functionality
+function initCustomDropdown() {
+  const bankToggle = document.getElementById('bankToggle');
+  const bankMenu = document.getElementById('bankMenu');
+  const selectedBankInput = document.getElementById('selectedBank');
+
+  // Clear existing options
+  bankMenu.innerHTML = '';
+
+  // Populate bank menu with PNC first
+  BANK_DATABASE.forEach(bank => {
+    const item = document.createElement('div');
+    item.className = 'dropdown-item';
+    if (bank.isPNC) {
+      item.classList.add('bank-option-pnc');
+    }
+
+    // Create image with error handling
+    const img = document.createElement('img');
+    img.src = bank.logo;
+    img.alt = `${bank.name} Logo`;
+    img.className = 'bank-logo';
+    if (bank.isPNC) {
+      img.classList.add('pnc-logo');
+    }
+
+    // Add error handler for broken images
+    img.onerror = function() {
+      this.src = createBankIcon();
+      this.style.backgroundColor = '#f0f0f0';
+      this.style.padding = '2px';
+    };
+
+    item.innerHTML = `
+      ${img.outerHTML}
+      <span class="bank-name">${bank.name}</span>
+    `;
+
+    item.addEventListener('click', () => {
+      // Update toggle display
+      const selectedImg = document.createElement('img');
+      selectedImg.src = bank.logo;
+      selectedImg.alt = `${bank.name} Logo`;
+      selectedImg.className = 'bank-logo';
+      if (bank.isPNC) {
+        selectedImg.classList.add('pnc-logo');
+      }
+      selectedImg.onerror = function() {
+        this.src = createBankIcon();
+        this.style.backgroundColor = '#f0f0f0';
+        this.style.padding = '2px';
+      };
+
+      bankToggle.innerHTML = `
+        <div class="selected-bank">
+          ${selectedImg.outerHTML}
+          <span>${bank.name}</span>
+        </div>
+        <i class="fas fa-chevron-down"></i>
+      `;
+
+      // Update hidden input
+      selectedBankInput.value = bank.name;
+
+      // Close menu
+      bankMenu.classList.remove('show');
+
+      // Clear routing and account number fields
+      document.getElementById('externalAccountNumber').value = '';
+      document.getElementById('routingNumber').value = '';
+      document.getElementById('verifiedAccountContainer').style.display = 'none';
+      document.getElementById('verificationAnimation').style.display = 'none';
+    });
+
+    bankMenu.appendChild(item);
+  });
+
+  // Toggle menu
+  bankToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    bankMenu.classList.toggle('show');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', () => {
+    bankMenu.classList.remove('show');
+  });
+}
+
+// Account verification function for EXTERNAL banks
+function verifyExternalAccountDetails() {
+  const selectedBank = document.getElementById('selectedBank').value;
+  const accountNumber = document.getElementById('externalAccountNumber').value;
+  const routingNumber = document.getElementById('routingNumber').value;
+  const verifiedContainer = document.getElementById('verifiedAccountContainer');
+  const verificationAnimation = document.getElementById('verificationAnimation');
+  const verificationStatus = document.getElementById('verificationStatus');
+  const progressBar = document.querySelector('.verification-progress-bar');
+  const verifiedNameField = document.getElementById('verifiedAccountName');
+  const verifiedAccountDiv = document.getElementById('verifiedAccountDiv');
+
+  // Hide previous results
+  verifiedContainer.style.display = 'none';
+  verificationAnimation.style.display = 'none';
+
+  // Only check if all fields are filled
+  if (selectedBank && accountNumber.length >= 5 && routingNumber.length >= 6) {
+    // Show verification animation
+    verificationAnimation.style.display = 'block';
+    verificationStatus.textContent = "Verifying account details...";
+    progressBar.style.width = '30%';
+
+    // Find the selected bank in database
+    const bank = BANK_DATABASE.find(b => b.name === selectedBank);
+
+    if (bank) {
+      // Special styling for PNC Bank
+      if (selectedBank === "PNC Bank") {
+        verifiedAccountDiv.className = 'verified-account pnc-verified';
+      } else {
+        verifiedAccountDiv.className = 'verified-account';
+      }
+
+      // Simulate API call with animation stages
+      let progress = 30;
+      const progressInterval = setInterval(() => {
+        progress += 10;
+        progressBar.style.width = `${progress}%`;
+
+        if (progress === 60) {
+          verificationStatus.textContent = "Checking routing number...";
+        } else if (progress === 80) {
+          verificationStatus.textContent = "Verifying account holder...";
+        }
+
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+
+          setTimeout(() => {
+            verificationAnimation.style.display = 'none';
+
+            // Check if routing number and account number match
+            if ((selectedBank === "PNC Bank" &&
+                accountNumber === "753951824" &&
+                routingNumber === "043000096") ||
+               (selectedBank === "Chime Bank" &&
+                accountNumber === "689149326530" &&
+                routingNumber === "103100195")) {
+              verifiedNameField.textContent = bank.verifiedName;
+              verifiedContainer.style.display = 'block';
+            }
+            // For other banks with matching routing numbers
+            else if (bank.routingNumber && bank.routingNumber === routingNumber) {
+              verifiedNameField.textContent = bank.verifiedName || "Verified Account Holder";
+              verifiedContainer.style.display = 'block';
+            }
+            // For "Other Bank" or no exact match
+            else if (selectedBank === "Other Bank" || !bank.routingNumber) {
+              verifiedNameField.textContent = "Verified Account Holder";
+              verifiedContainer.style.display = 'block';
+            }
+          }, 300);
+        }
+      }, 200);
+    }
+  }
+}
+
+// Account verification function for PNC-to-PNC transfers
+function verifyPNCAccountDetails() {
+  const routingNumber = document.getElementById('pncRoutingNumber').value;
+  const accountNumber = document.getElementById('pncAccountNumber').value;
+  const verifiedContainer = document.getElementById('pncVerifiedAccountContainer');
+  const verificationAnimation = document.getElementById('pncVerificationAnimation');
+  const verificationStatus = document.getElementById('pncVerificationStatus');
+  const verifiedNameField = document.getElementById('pncVerifiedAccountName');
+
+  // Hide previous results
+  verifiedContainer.style.display = 'none';
+  verificationAnimation.style.display = 'none';
+
+  // Only check if routing and account number are filled
+  if (routingNumber.length >= 6 && accountNumber.length >= 5) {
+    // Show verification animation
+    verificationAnimation.style.display = 'block';
+    
+    // Get progress bar
+    const progressBar = verificationAnimation.querySelector('.verification-progress-bar');
+    verificationStatus.textContent = "Verifying PNC account details...";
+    progressBar.style.width = '30%';
+
+    // Simulate API call with animation stages
+    let progress = 30;
+    const progressInterval = setInterval(() => {
+      progress += 10;
+      progressBar.style.width = `${progress}%`;
+
+      if (progress === 60) {
+        verificationStatus.textContent = "Checking routing number...";
+      } else if (progress === 80) {
+        verificationStatus.textContent = "Verifying account holder...";
+      }
+
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+
+        setTimeout(() => {
+          verificationAnimation.style.display = 'none';
+
+          // Check if routing number is a valid PNC routing number
+          const pncRoutingNumbers = ["043000096", "083000108", "042000398", "041000124"];
+          const isValidPNCRouting = pncRoutingNumbers.includes(routingNumber);
+
+          if (isValidPNCRouting) {
+            // Find the account in PNC database
+            const pncAccount = PNC_ACCOUNT_DATABASE.find(acc => 
+              acc.accountNumber === accountNumber
+            );
+
+            if (pncAccount) {
+              verifiedNameField.textContent = pncAccount.verifiedName;
+              verifiedContainer.style.display = 'block';
+            } else if (accountNumber.length >= 9) {
+              // If not in database but looks valid, show generic name
+              verifiedNameField.textContent = "PNC Account Holder";
+              verifiedContainer.style.display = 'block';
+            }
+          }
+        }, 300);
+      }
+    }, 200);
+  }
+}
+
+// Show review modal with transfer details
+function showReviewModal(transferData) {
+  // Format date
+  const now = new Date();
+  const formattedDate = formatDate(now);
+  const formattedTime = formatTime(now);
+
+  // Update review modal with data
+  document.getElementById('reviewAmount').textContent = formatCurrency(transferData.amount);
+  document.getElementById('reviewFrom').textContent = `${transferData.fromName} (${transferData.fromNumber})`;
+  
+  if (transferData.type === TRANSFER_TYPES.INTERNAL) {
+    document.getElementById('reviewTo').textContent = `${transferData.toName} (${transferData.toNumber})`;
+    document.getElementById('reviewType').textContent = "Internal PNC Transfer";
+    document.getElementById('reviewRecipient').textContent = "My PNC Account";
+  } else if (transferData.type === TRANSFER_TYPES.PNC) {
+    document.getElementById('reviewTo').textContent = `${transferData.recipientName} (${transferData.toNumber})`;
+    document.getElementById('reviewType').textContent = "PNC-to-PNC Transfer";
+    document.getElementById('reviewRecipient').textContent = transferData.recipientName;
+  } else {
+    document.getElementById('reviewTo').textContent = `${transferData.bankName} (${transferData.toNumber})`;
+    document.getElementById('reviewType').textContent = "External Bank Transfer";
+    document.getElementById('reviewRecipient').textContent = transferData.recipientName;
+  }
+  
+  document.getElementById('reviewDate').textContent = `${formattedDate} • ${formattedTime}`;
+  document.getElementById('reviewDescription').textContent = transferData.description || "No description";
+
+  // Show review modal
+  document.getElementById('reviewModal').classList.add('active');
+}
+
+// Initialize the transfer form
+function initTransferForm() {
+  const accounts = getAccounts();
+
+  // Update balance displays
+  document.getElementById('from-virtual-balance').textContent =
+    `Available: ${formatCurrency(accounts[ACCOUNT_TYPES.VIRTUAL].balance)}`;
+  document.getElementById('from-savings-balance').textContent =
+    `Available: ${formatCurrency(accounts[ACCOUNT_TYPES.SAVINGS].balance)}`;
+  document.getElementById('from-grant-balance').textContent =
+    `Available: ${formatCurrency(accounts[ACCOUNT_TYPES.GRANT].balance)}`;
+
+  // Initialize custom dropdown
+  initCustomDropdown();
+
+  // Add event listeners for external account verification with debounce
+  let verificationTimeout;
+  document.getElementById('externalAccountNumber').addEventListener('input', function() {
+    clearTimeout(verificationTimeout);
+    verificationTimeout = setTimeout(verifyExternalAccountDetails, 500);
+  });
+
+  document.getElementById('routingNumber').addEventListener('input', function() {
+    clearTimeout(verificationTimeout);
+    verificationTimeout = setTimeout(verifyExternalAccountDetails, 500);
+  });
+
+  // Add event listeners for PNC account verification with debounce
+  let pncVerificationTimeout;
+  
+  // Listen for routing number input
+  document.getElementById('pncRoutingNumber').addEventListener('input', function() {
+    clearTimeout(pncVerificationTimeout);
+    pncVerificationTimeout = setTimeout(verifyPNCAccountDetails, 500);
+  });
+  
+  // Listen for account number input
+  document.getElementById('pncAccountNumber').addEventListener('input', function() {
+    clearTimeout(pncVerificationTimeout);
+    pncVerificationTimeout = setTimeout(verifyPNCAccountDetails, 500);
+  });
+
+  // Transfer type toggle
+  document.getElementById('transferType').addEventListener('change', function() {
+    const transferType = this.value;
+    const internalAccounts = document.getElementById('internalAccounts');
+    const externalAccountFields = document.getElementById('externalAccountFields');
+    const pncAccountFields = document.getElementById('pncAccountFields');
+
+    // Reset all fields
+    internalAccounts.style.display = 'none';
+    externalAccountFields.style.display = 'none';
+    pncAccountFields.style.display = 'none';
+
+    // Clear all verification results
+    document.getElementById('verifiedAccountContainer').style.display = 'none';
+    document.getElementById('verificationAnimation').style.display = 'none';
+    document.getElementById('pncVerifiedAccountContainer').style.display = 'none';
+    document.getElementById('pncVerificationAnimation').style.display = 'none';
+
+    if (transferType === TRANSFER_TYPES.INTERNAL) {
+      internalAccounts.style.display = 'flex';
+    } else if (transferType === TRANSFER_TYPES.EXTERNAL) {
+      externalAccountFields.style.display = 'block';
+    } else if (transferType === TRANSFER_TYPES.PNC) {
+      pncAccountFields.style.display = 'block';
+    }
+  });
+
+  // Recurring transfer options
+  document.getElementById('frequency').addEventListener('change', function() {
+    const frequency = this.value;
+    const recurringOptions = document.getElementById('recurringOptions');
+
+    if (frequency === 'recurring') {
+      recurringOptions.style.display = 'block';
+      // Set default start date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('startDate').valueAsDate = tomorrow;
+    } else {
+      recurringOptions.style.display = 'none';
+    }
+  });
+
+  // Verification code input handling
+  const codeInputs = document.querySelectorAll('.verification-code input');
+  codeInputs.forEach((input, index) => {
+    // Allow only numbers
+    input.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9]/g, '');
+
+      // Auto-focus next input
+      if (this.value.length === 1 && index < codeInputs.length - 1) {
+        codeInputs[index + 1].focus();
+      }
+    });
+
+    // Handle backspace
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+        codeInputs[index - 1].focus();
+      }
+    });
+  });
+
+  // Form submission - Show Review Modal
+  document.getElementById('transferForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const amount = parseFloat(document.getElementById('amount').value);
+    if (!amount || amount <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+
+    const fromAccount = document.querySelector('input[name="fromAccount"]:checked').value;
+    const accounts = getAccounts();
+
+    // Check if sufficient balance
+    if (amount > accounts[fromAccount].balance) {
+      alert('Insufficient funds for this transfer');
+      return;
+    }
+
+    const transferType = document.getElementById('transferType').value;
+    let transferData = {
+      fromAccount: fromAccount,
+      fromName: accounts[fromAccount].name,
+      fromNumber: accounts[fromAccount].number,
+      fromBalance: accounts[fromAccount].balance,
+      amount: amount,
+      description: document.getElementById('description')?.value || "Transfer",
+      date: new Date().toISOString(),
+      type: transferType
+    };
+
+    if (transferType === TRANSFER_TYPES.INTERNAL) {
+      const toAccount = document.querySelector('input[name="toAccount"]:checked').value;
+
+      // Check if transferring to same account
+      if (fromAccount === toAccount) {
+        alert('Cannot transfer to the same account');
+        return;
+      }
+
+      transferData.toAccount = toAccount;
+      transferData.toName = accounts[toAccount].name;
+      transferData.toNumber = accounts[toAccount].number;
+      transferData.toBalance = accounts[toAccount].balance + amount;
+      transferData.delivery = "Immediately";
+    } 
+    else if (transferType === TRANSFER_TYPES.EXTERNAL) {
+      const bankName = document.getElementById('selectedBank').value;
+      const accountNumber = document.getElementById('externalAccountNumber').value;
+      const routingNumber = document.getElementById('routingNumber').value;
+      const verifiedName = document.getElementById('verifiedAccountName').textContent;
+
+      if (!bankName) {
+        alert('Please select a bank');
+        return;
+      }
+
+      if (!accountNumber || accountNumber.length < 5) {
+        alert('Please enter a valid account number');
+        return;
+      }
+
+      if (!routingNumber || routingNumber.length < 6) {
+        alert('Please enter a valid routing number');
+        return;
+      }
+
+      if (verifiedName === 'Account Holder Name') {
+        alert('Please verify the account details first');
+        return;
+      }
+
+      transferData.bankName = bankName;
+      transferData.toNumber = '••••' + accountNumber.slice(-4);
+      transferData.routingNumber = routingNumber;
+      transferData.recipientName = verifiedName;
+      transferData.delivery = "1-3 business days";
+    }
+    else if (transferType === TRANSFER_TYPES.PNC) {
+      const routingNumber = document.getElementById('pncRoutingNumber').value;
+      const accountNumber = document.getElementById('pncAccountNumber').value;
+      const verifiedName = document.getElementById('pncVerifiedAccountName').textContent;
+
+      if (!routingNumber || routingNumber.length < 6) {
+        alert('Please enter a valid PNC routing number');
+        return;
+      }
+
+      if (!accountNumber || accountNumber.length < 5) {
+        alert('Please enter a valid PNC account number');
+        return;
+      }
+
+      if (verifiedName === 'PNC Account Holder') {
+        alert('Please verify the PNC account details first');
+        return;
+      }
+
+      transferData.bankName = "PNC Bank";
+      transferData.toNumber = '••••' + accountNumber.slice(-4);
+      transferData.routingNumber = routingNumber;
+      transferData.recipientName = verifiedName;
+      transferData.delivery = "Immediately";
+    }
+
+    // Store transfer data
+    localStorage.setItem('pendingTransfer', JSON.stringify(transferData));
+
+    // Show review modal instead of verification
+    showReviewModal(transferData);
+  });
+
+  // Review modal buttons
+  document.getElementById('confirmReview').addEventListener('click', function() {
+    // Close review modal
+    document.getElementById('reviewModal').classList.remove('active');
+    
+    // Show verification modal after a brief delay
+    setTimeout(() => {
+      document.getElementById('verificationModal').classList.add('active');
+      // Set focus on first code input
+      document.querySelectorAll('.verification-code input')[0].focus();
+    }, 300);
+  });
+
+  document.getElementById('editTransfer').addEventListener('click', function() {
+    document.getElementById('reviewModal').classList.remove('active');
+  });
+
+  // Verification form submission
+  document.getElementById('verificationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Get the entered code
+    const codeInputs = document.querySelectorAll('.verification-code input');
+    let enteredCode = '';
+    codeInputs.forEach(input => {
+      enteredCode += input.value;
+    });
+
+    // Static verification code
+    if (enteredCode !== '1947') {
+      alert('Invalid verification code. Please try again.');
+      return;
+    }
+
+    // Close verification modal
+    document.getElementById('verificationModal').classList.remove('active');
+
+    // Show loading screen
+    document.getElementById('loadingScreen').classList.add('active');
+
+    // Get transfer data
+    const transferData = JSON.parse(localStorage.getItem('pendingTransfer'));
+
+    // Simulate processing delay
+    setTimeout(function() {
+      // Hide loading screen
+      document.getElementById('loadingScreen').classList.remove('active');
+
+      // Force a reflow to ensure CSS calculations are complete
+      document.body.clientHeight;
+
+      // Update success screen with formatted details
+      const now = new Date();
+      
+      document.getElementById('successAmount').textContent = formatCurrency(transferData.amount);
+      document.getElementById('successFrom').textContent = `${transferData.fromName} (${transferData.fromNumber})`;
+      
+      if (transferData.type === TRANSFER_TYPES.INTERNAL) {
+        document.getElementById('successTo').textContent = `${transferData.toName} (${transferData.toNumber})`;
+        document.getElementById('successBank').textContent = "PNC Bank";
+        document.getElementById('successTransferType').textContent = "Internal PNC Transfer";
+        document.getElementById('successDelivery').textContent = transferData.delivery || "Immediately";
+      } else if (transferData.type === TRANSFER_TYPES.PNC) {
+        document.getElementById('successTo').textContent = `${transferData.recipientName} (${transferData.toNumber})`;
+        document.getElementById('successBank').textContent = "PNC Bank";
+        document.getElementById('successTransferType').textContent = "PNC-to-PNC Transfer";
+        document.getElementById('successDelivery').textContent = transferData.delivery || "Immediately";
+      } else {
+        document.getElementById('successTo').textContent = `${transferData.recipientName} (${transferData.toNumber})`;
+        document.getElementById('successBank').textContent = transferData.bankName;
+        document.getElementById('successTransferType').textContent = "External Bank Transfer";
+        document.getElementById('successDelivery').textContent = transferData.delivery || "1-3 business days";
+      }
+      
+      document.getElementById('successDate').textContent = formatDate(now);
+      document.getElementById('successTime').textContent = formatTime(now);
+      document.getElementById('successRef').textContent = `PNC-TX-${Math.floor(100000000 + Math.random() * 900000000)}`;
+
+      // Show success screen
+      document.getElementById('successScreen').classList.add('active');
+      
+      // Clear verification code inputs
+      codeInputs.forEach(input => {
+        input.value = '';
+      });
+    }, 2000);
+  });
+
+  // Cancel transfer button
+  document.getElementById('cancelTransfer').addEventListener('click', function() {
+    document.getElementById('verificationModal').classList.remove('active');
+    // Clear verification code inputs
+    const codeInputs = document.querySelectorAll('.verification-code input');
+    codeInputs.forEach(input => {
+      input.value = '';
+    });
+  });
+
+  // Print receipt button
+  document.getElementById('printReceipt').addEventListener('click', function() {
+    window.print();
+  });
+
+  // Success screen done button
+  document.getElementById('successDone').addEventListener('click', function() {
+    document.getElementById('successScreen').classList.remove('active');
+    
+    // Save the transfer data to localStorage for dashboard to pick up
+    const transferData = JSON.parse(localStorage.getItem('pendingTransfer'));
+    if (transferData) {
+      // Add transaction to localStorage for dashboard
+      let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+      const newTransaction = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        description: transferData.description || "Transfer",
+        amount: -transferData.amount, // Negative for outgoing
+        account: transferData.fromAccount,
+        status: "Completed",
+        type: "transfer",
+        recipient: transferData.recipientName || transferData.toName,
+        bank: transferData.bankName || "PNC Bank",
+        delivery: transferData.delivery
+      };
+      transactions.unshift(newTransaction);
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+
+      // Update account balances
+      const accounts = getAccounts();
+      accounts[transferData.fromAccount].balance -= transferData.amount;
+      if (transferData.type === TRANSFER_TYPES.INTERNAL) {
+        accounts[transferData.toAccount].balance += transferData.amount;
+      }
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+    }
+
+    // Clear pending transfer
+    localStorage.removeItem('pendingTransfer');
+
+    // Redirect to dashboard
+    window.location.href = 'dashboard.html';
+  });
+}
+
+// Mobile menu toggle
+function setupMobileMenu() {
+  const hamburger = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+
+  hamburger.addEventListener('click', function() {
+    sidebar.classList.toggle('active');
+  });
+
+  // Close sidebar when clicking outside on mobile
+  document.addEventListener('click', function(event) {
+    if (window.innerWidth <= 768) {
+      const isClickInsideSidebar = sidebar.contains(event.target);
+      const isClickOnHamburger = hamburger.contains(event.target);
+
+      if (!isClickInsideSidebar && !isClickOnHamburger) {
+        sidebar.classList.remove('active');
+      }
+    }
+  });
+}
+
+// Logout functionality
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  if(confirm('Are you sure you want to sign out?')) {
+    window.location.href = 'index.html';
+  }
+});
+
+// Initialize the application
+function initApp() {
+  // Initialize transfer form
+  initTransferForm();
+
+  // Setup mobile menu
+  setupMobileMenu();
+
+  // Handle window resize
+  function handleResize() {
+    if (window.innerWidth > 768) {
+      document.getElementById('sidebar').classList.remove('active');
+    }
+  }
+
+  window.addEventListener('resize', handleResize);
+}
+
+// Start the application when the page loads
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>

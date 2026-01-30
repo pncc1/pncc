@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNC Bank | Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+--primary-blue: #003366;
+--accent-orange: #FF8200;
+--light-gray: #F5F5F5;
+--dark-gray: #333333;
+--white: #FFFFFF;
+--success-green: #28a745;
+--error-red: #dc3545;
+}
+
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background-color: var(--light-gray);
+color: var(--dark-gray);
+line-height: 1.6;
+}
+
+.dashboard-header {
+background-color: var(--white);
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+padding: 1rem;
+position: sticky;
+top: 0;
+z-index: 100;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.logo {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.logo img {
+height: 30px;
+}
+
+.header-controls {
+display: flex;
+align-items: center;
+gap: 15px;
+}
+
+.user-avatar {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background-color: var(--primary-blue);
+color: white;
+display: flex;
+justify-content: center;
+align-items: center;
+font-weight: bold;
+}
+
+.hamburger {
+background: none;
+border: none;
+font-size: 1.2rem;
+color: var(--primary-blue);
+cursor: pointer;
+padding: 5px;
+}
+
+.dashboard-container {
+display: flex;
+min-height: calc(100vh - 60px);
+}
+
+.sidebar {
+width: 0;
+background-color: var(--primary-blue);
+color: white;
+transition: all 0.3s ease;
+overflow: hidden;
+position: fixed;
+top: 60px;
+left: 0;
+height: calc(100vh - 60px);
+z-index: 90;
+display: flex;
+flex-direction: column;
+}
+
+.sidebar.active {
+width: 250px;
+}
+
+.sidebar-menu {
+list-style: none;
+padding: 1.5rem 0;
+flex: 1;
+}
+
+.sidebar-menu li a {
+display: flex;
+align-items: center;
+padding: 0.8rem 1.5rem;
+color: white;
+text-decoration: none;
+transition: all 0.3s ease;
+}
+
+.sidebar-menu li a:hover {
+background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu li a.active {
+background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-menu i {
+margin-right: 10px;
+width: 20px;
+text-align: center;
+}
+
+.sidebar-footer {
+padding: 1rem 1.5rem;
+border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-signout {
+background-color: transparent;
+color: white;
+text-align: left;
+padding: 0.8rem 1.5rem;
+width: 100%;
+display: flex;
+align-items: center;
+border: none;
+cursor: pointer;
+font-size: 1rem;
+}
+
+.btn-signout:hover {
+background-color: rgba(255, 255, 255, 0.1);
+}
+
+.main-content {
+flex: 1;
+padding: 1.5rem;
+width: 100%;
+}
+
+.welcome-banner {
+background-color: var(--white);
+border-radius: 8px;
+padding: 1.5rem;
+margin-bottom: 1.5rem;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.account-cards {
+display: grid;
+grid-template-columns: 1fr;
+gap: 1rem;
+margin-bottom: 1.5rem;
+}
+
+.account-card {
+background-color: var(--white);
+border-radius: 8px;
+padding: 1.5rem;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.account-card-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.5rem;
+}
+
+.account-status {
+font-size: 0.9rem;
+padding: 0.3rem 0.6rem;
+border-radius: 4px;
+background-color: var(--success-green);
+color: white;
+}
+
+.account-balance {
+font-size: 1.5rem;
+font-weight: bold;
+margin: 0.5rem 0;
+}
+
+.account-number {
+color: #666;
+font-size: 0.9rem;
+margin-bottom: 1rem;
+}
+
+.account-actions {
+display: flex;
+gap: 0.8rem;
+}
+
+.btn {
+padding: 0.7rem 1rem;
+border: none;
+border-radius: 5px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+text-align: center;
+text-decoration: none;
+display: inline-block;
+}
+
+.btn-sm {
+font-size: 0.9rem;
+padding: 0.6rem 1rem;
+}
+
+.btn-primary {
+background-color: var(--primary-blue);
+color: white;
+}
+
+.btn-primary:hover {
+background-color: #002b57;
+}
+
+.quick-actions {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 1rem;
+margin-bottom: 1.5rem;
+}
+
+.quick-action {
+background-color: var(--white);
+border-radius: 8px;
+padding: 1.2rem 0.8rem;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+text-align: center;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.quick-action:hover {
+transform: translateY(-3px);
+box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.quick-action i {
+font-size: 1.5rem;
+color: var(--primary-blue);
+margin-bottom: 0.5rem;
+}
+
+.quick-action p {
+font-size: 0.9rem;
+font-weight: 600;
+}
+
+.transactions {
+background-color: var(--white);
+border-radius: 8px;
+padding: 1.5rem;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+margin-bottom: 1.5rem;
+overflow-x: auto;
+}
+
+.transactions-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 1.5rem;
+}
+
+.view-all {
+color: var(--primary-blue);
+text-decoration: none;
+font-weight: 600;
+font-size: 0.9rem;
+}
+
+.transaction-table {
+width: 100%;
+border-collapse: collapse;
+min-width: 600px;
+}
+
+.modal {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.5);
+z-index: 1000;
+justify-content: center;
+align-items: center;
+}
+
+.modal-content {
+background: white;
+padding: 20px;
+border-radius: 8px;
+width: 90%;
+max-width: 400px;
+}
+
+.form-actions {
+display: flex;
+gap: 10px;
+margin-top: 20px;
+}
+
+.transaction-table th,
+.transaction-table td {
+padding: 1rem;
+text-align: left;
+border-bottom: 1px solid #eee;
+}
+
+.transaction-table th {
+color: var(--primary-blue);
+font-weight: 600;
+font-size: 0.9rem;
+}
+
+.transaction-table td {
+font-size: 0.9rem;
+}
+
+.positive {
+color: var(--success-green);
+font-weight: 600;
+}
+
+.negative {
+color: var(--error-red);
+font-weight: 600;
+}
+
+@media (min-width: 768px) {
+.sidebar {
+width: 250px;
+position: static;
+height: auto;
+}
+
+.main-content {
+width: calc(100% - 250px);
+}
+
+.hamburger {
+display: none;
+}
+
+.account-cards {
+grid-template-columns: repeat(2, 1fr);
+gap: 1.5rem;
+}
+
+.quick-actions {
+grid-template-columns: repeat(3, 1fr);
+}
+}
+
+@media (min-width: 992px) {
+.quick-actions {
+grid-template-columns: repeat(4, 1fr);
+}
+
+.account-balance {
+font-size: 1.8rem;
+}
+}
+</style>
+</head>
+
+<body>
+<header class="dashboard-header">
+<div class="logo">
+<img src="PNC-Bank-Logo.jpg" alt="PNC Bank Logo">
+<span>PNC Online Banking</span>
+</div>
+<div class="header-controls">
+<div class="user-avatar">CT</div>
+<button class="hamburger" id="hamburger">
+<i class="fas fa-bars"></i>
+</button>
+</div>
+</header>
+
+<div class="dashboard-container">
+<aside class="sidebar" id="sidebar">
+<ul class="sidebar-menu">
+<li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+<li><a href="dashboard.html"><i class="fas fa-wallet"></i> Accounts</a></li>
+<li><a href="transfer.html"><i class="fas fa-exchange-alt"></i> Transfer</a></li>
+<li><a href="paybills.html"><i class="fas fa-money-bill-wave"></i> Pay Bills</a></li>
+<li><a href="cards.html"><i class="fas fa-credit-card"></i> Cards</a></li>
+<li><a href="investment.html"><i class="fas fa-chart-line"></i> Investments</a></li>
+<li><a href="savings.html"><i class="fas fa-piggy-bank"></i> Savings Goals</a></li>
+<li><a href="message.html"><i class="fas fa-envelope"></i> Messages</a></li>
+<li><a href="statement.html"><i class="fas fa-file-invoice-dollar"></i> Statements</a></li>
+<li><a href="security.html"><i class="fas fa-user-shield"></i> Security</a></li>
+<li><a href="help.html"><i class="fas fa-question-circle"></i> Help</a></li>
+</ul>
+
+<div class="sidebar-footer">
+<button class="btn-signout" id="logoutBtn">
+<i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i>
+Sign Out
+</button>
+</div>
+</aside>
+
+<main class="main-content">
+<div class="welcome-banner">
+<h2>Welcome back, Calvin!</h2>
+<p>Here's what's happening with your accounts today.</p>
+</div>
+
+<div class="account-cards">
+<div class="account-card" id="virtual-wallet-card">
+<div class="account-card-header">
+<h3>Virtual Wallet</h3>
+<span class="account-status">Active</span>
+</div>
+<div class="account-balance" id="virtual-balance">$0.00</div>
+<div class="account-number">Account ending in ••••7890</div>
+<div class="account-actions">
+<a href="details.html" class="btn btn-primary btn-sm">Details</a>
+<a href="transfer.html" class="btn btn-primary btn-sm">Transfer</a>
+<button class="btn btn-primary btn-sm deposit-btn" data-account="virtual">Deposit</button>
+</div>
+</div>
+
+<div class="account-card" id="savings-account-card">
+<div class="account-card-header">
+<h3>Savings Account</h3>
+</div>
+<div class="account-balance" id="savings-balance">$0.00</div>
+<div class="account-number">Account ending in ••••4567</div>
+<div class="account-actions">
+<a href="details.html" class="btn btn-primary btn-sm">Details</a>
+<a href="transfer.html" class="btn btn-primary btn-sm">Transfer</a>
+<button class="btn btn-primary btn-sm deposit-btn" data-account="savings">Deposit</button>
+</div>
+</div>
+
+<div class="account-card" id="grant-funds-card">
+<div class="account-card-header">
+<h3>Grant Funds</h3>
+<span class="account-status">Active</span>
+</div>
+<div class="account-balance" id="grant-balance">$100,000.00</div>
+<div class="account-number">Account ending in ••••1234</div>
+<div class="account-actions">
+<a href="details.html" class="btn btn-primary btn-sm">Details</a>
+<a href="transfer.html" class="btn btn-primary btn-sm">Transfer</a>
+<button class="btn btn-primary btn-sm deposit-btn" data-account="grant">Deposit</button>
+</div>
+</div>
+</div>
+
+<div class="quick-actions">
+<div class="quick-action" data-action="transfer">
+<i class="fas fa-exchange-alt"></i>
+<p>Transfer</p>
+</div>
+<div class="quick-action" data-action="pay-bills">
+<i class="fas fa-money-bill-wave"></i>
+<p>Pay Bills</p>
+</div>
+<div class="quick-action" data-action="deposit">
+<i class="fas fa-mobile-alt"></i>
+<p>Deposit</p>
+</div>
+<div class="quick-action" data-action="zelle">
+<i class="fas fa-qrcode"></i>
+<p>Zelle®️</p>
+</div>
+</div>
+
+<div id="quickDepositModal" class="modal">
+<div style="background:white; padding:2rem; border-radius:8px; width:90%; max-width:400px;">
+<h3>Mobile Deposit</h3>
+<div class="form-group">
+<label>Select Account</label>
+<select class="form-control" id="depositAccount">
+<option value="virtual">Virtual Wallet (••••7890)</option>
+<option value="savings">Savings Account (••••4567)</option>
+<option value="grant">Grant Funds (••••1234)</option>
+</select>
+</div>
+<div class="form-group">
+<label>Amount</label>
+<input type="number" class="form-control" id="quickDepositAmount" min="0.01" step="0.01" placeholder="0.00">
+</div>
+<div class="form-group">
+<label>Check Front Image</label>
+<input type="file" id="checkFront" accept="image/*" capture="camera">
+</div>
+<div class="form-group">
+<label>Check Back Image</label>
+<input type="file" id="checkBack" accept="image/*" capture="camera">
+</div>
+<div style="display:flex; gap:1rem; margin-top:1.5rem;">
+<button id="cancelQuickDeposit" class="btn" style="background:#ccc;">Cancel</button>
+<button id="confirmQuickDeposit" class="btn btn-primary">Submit Deposit</button>
+</div>
+</div>
+</div>
+
+<div class="transactions">
+<div class="transactions-header">
+<h3>Recent Transactions</h3>
+<a href="details.html" class="view-all">View All</a>
+</div>
+<table class="transaction-table" id="transactionsTable">
+<thead>
+<tr>
+<th>Date</th>
+<th>Description</th>
+<th>Amount</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="transactionsBody">
+<!-- Transactions will be loaded here -->
+</tbody>
+</table>
+</div>
+</main>
+</div>
+
+<div id="depositModal" class="modal">
+<div style="background:white; padding:2rem; border-radius:8px; width:90%; max-width:400px;">
+<h3>Make a Deposit</h3>
+<p>Account: <span id="depositAccountName"></span></p>
+<div style="margin:1rem 0;">
+<label for="depositAmount">Amount:</label>
+<input type="number" id="depositAmount" style="width:100%; padding:0.5rem; margin-top:0.5rem;" min="0.01" step="0.01">
+</div>
+<div style="display:flex; gap:1rem; margin-top:1.5rem;">
+<button id="cancelDeposit" class="btn" style="background:#ccc;">Cancel</button>
+<button id="confirmDeposit" class="btn btn-primary">Deposit</button>
+</div>
+</div>
+</div>
+
+<script>
+const ACCOUNT_TYPES = {
+VIRTUAL: 'virtual',
+SAVINGS: 'savings',
+GRANT: 'grant'
+};
+
+function initializeAccounts() {
+if (!localStorage.getItem('accounts')) {
+const defaultAccounts = {
+[ACCOUNT_TYPES.VIRTUAL]: {
+id: ACCOUNT_TYPES.VIRTUAL,
+name: "Virtual Wallet",
+number: "••••7890",
+balance: 0.00,
+status: "Active"
+},
+[ACCOUNT_TYPES.SAVINGS]: {
+id: ACCOUNT_TYPES.SAVINGS,
+name: "Savings Account",
+number: "••••4567",
+balance: 0.00,
+status: ""
+},
+[ACCOUNT_TYPES.GRANT]: {
+id: ACCOUNT_TYPES.GRANT,
+name: "Grant Funds",
+number: "••••1234",
+balance: 100000.00,
+status: "Active"
+}
+};
+localStorage.setItem('accounts', JSON.stringify(defaultAccounts));
+return defaultAccounts;
+}
+return JSON.parse(localStorage.getItem('accounts'));
+}
+
+function initializeTransactions() {
+if (!localStorage.getItem('transactions')) {
+const defaultTransactions = [
+createTransaction("JULIE LEACH CHARITY PROGRAM", 100000.00, ACCOUNT_TYPES.GRANT)
+];
+localStorage.setItem('transactions', JSON.stringify(defaultTransactions));
+return defaultTransactions;
+}
+return JSON.parse(localStorage.getItem('transactions'));
+}
+
+function createTransaction(description, amount, accountId) {
+return {
+id: Date.now(),
+date: new Date().toISOString(),
+description,
+amount,
+account: accountId,
+status: "Completed"
+};
+}
+
+function processPendingTransfers(accounts, transactions) {
+const transferData = localStorage.getItem('pendingTransfer');
+if (!transferData) return;
+
+try {
+const transfer = JSON.parse(transferData);
+
+if (!transfer.fromAccount || !accounts[transfer.fromAccount] ||
+isNaN(transfer.amount) || transfer.amount <= 0) {
+console.error("Invalid transfer data");
+localStorage.removeItem('pendingTransfer');
+return;
+}
+
+transactions.unshift(createTransaction(
+transfer.description || "Transfer",
+-transfer.amount,
+transfer.fromAccount
+));
+
+accounts[transfer.fromAccount].balance -= transfer.amount;
+
+if (transfer.toAccount && accounts[transfer.toAccount]) {
+transactions.unshift(createTransaction(
+transfer.description || "Transfer Received",
+transfer.amount,
+transfer.toAccount
+));
+accounts[transfer.toAccount].balance += transfer.amount;
+}
+
+localStorage.setItem('accounts', JSON.stringify(accounts));
+localStorage.setItem('transactions', JSON.stringify(transactions));
+localStorage.removeItem('pendingTransfer');
+
+return true;
+
+} catch (e) {
+console.error("Transfer processing failed:", e);
+localStorage.removeItem('pendingTransfer');
+return false;
+}
+}
+
+function formatCurrency(amount) {
+const num = Number(amount);
+if (isNaN(num)) return "$0.00";
+
+return new Intl.NumberFormat('en-US', {
+style: 'currency',
+currency: 'USD',
+minimumFractionDigits: 2,
+maximumFractionDigits: 2
+}).format(num);
+}
+
+function formatShortDate(dateString) {
+const date = new Date(dateString);
+return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function updateAccountBalances(accounts) {
+document.getElementById('virtual-balance').textContent = formatCurrency(accounts[ACCOUNT_TYPES.VIRTUAL].balance);
+document.getElementById('savings-balance').textContent = formatCurrency(accounts[ACCOUNT_TYPES.SAVINGS].balance);
+document.getElementById('grant-balance').textContent = formatCurrency(accounts[ACCOUNT_TYPES.GRANT].balance);
+}
+
+function renderTransactions(transactions) {
+const tbody = document.getElementById('transactionsBody');
+tbody.innerHTML = '';
+
+const sorted = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+sorted.slice(0, 10).forEach(tx => {
+const amount = Number(tx.amount);
+const isValidAmount = !isNaN(amount);
+
+const row = document.createElement('tr');
+row.innerHTML = `
+<td>${formatShortDate(tx.date)}</td>
+<td>${tx.description || 'Unknown Transaction'}</td>
+<td class="${isValidAmount ? (amount > 0 ? 'positive' : 'negative') : ''}">
+${isValidAmount ? (amount > 0 ? '+' : '') + formatCurrency(amount) : '$0.00'}
+</td>
+<td>${tx.status || 'Completed'}</td>
+`;
+tbody.appendChild(row);
+});
+}
+
+function setupDepositButtons() {
+const depositButtons = document.querySelectorAll('.deposit-btn');
+const modal = document.getElementById('depositModal');
+const cancelBtn = document.getElementById('cancelDeposit');
+const confirmBtn = document.getElementById('confirmDeposit');
+const depositAmount = document.getElementById('depositAmount');
+const depositAccountName = document.getElementById('depositAccountName');
+
+let currentAccount = null;
+
+depositButtons.forEach(btn => {
+btn.addEventListener('click', function () {
+currentAccount = this.getAttribute('data-account');
+const accounts = JSON.parse(localStorage.getItem('accounts'));
+depositAccountName.textContent = accounts[currentAccount].name;
+depositAmount.value = '';
+modal.style.display = 'flex';
+});
+});
+
+cancelBtn.addEventListener('click', function () {
+modal.style.display = 'none';
+});
+
+confirmBtn.addEventListener('click', function () {
+const amount = parseFloat(depositAmount.value);
+if (isNaN(amount) || amount <= 0) {
+alert('Please enter a valid amount');
+return;
+}
+
+makeDeposit(currentAccount, amount);
+modal.style.display = 'none';
+});
+
+modal.addEventListener('click', function (e) {
+if (e.target === modal) {
+modal.style.display = 'none';
+}
+});
+}
+
+function makeDeposit(accountId, amount) {
+const accounts = JSON.parse(localStorage.getItem('accounts'));
+const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+accounts[accountId].balance += amount;
+
+const transaction = createTransaction(
+"Deposit",
+amount,
+accountId
+);
+transactions.unshift(transaction);
+
+localStorage.setItem('accounts', JSON.stringify(accounts));
+localStorage.setItem('transactions', JSON.stringify(transactions));
+
+updateAccountBalances(accounts);
+renderTransactions(transactions);
+
+alert(`Successfully deposited ${formatCurrency(amount)} to ${accounts[accountId].name}`);
+}
+
+function setupMobileMenu() {
+const hamburger = document.getElementById('hamburger');
+const sidebar = document.getElementById('sidebar');
+
+hamburger.addEventListener('click', function () {
+sidebar.classList.toggle('active');
+});
+
+document.addEventListener('click', function (event) {
+if (window.innerWidth <= 768) {
+const isClickInsideSidebar = sidebar.contains(event.target);
+const isClickOnHamburger = hamburger.contains(event.target);
+
+if (!isClickInsideSidebar && !isClickOnHamburger) {
+sidebar.classList.remove('active');
+}
+}
+});
+}
+
+function setupLogoutButton() {
+document.getElementById('logoutBtn').addEventListener('click', function () {
+if (confirm('Are you sure you want to sign out?')) {
+window.location.href = 'index.html';
+}
+});
+}
+
+function setupQuickActions() {
+document.querySelectorAll('.quick-action').forEach(action => {
+action.addEventListener('click', function () {
+const actionType = this.getAttribute('data-action');
+
+if (actionType === 'transfer') {
+window.location.href = 'transfer.html';
+}
+else if (actionType === 'deposit') {
+document.getElementById('quickDepositModal').style.display = 'flex';
+}
+else {
+alert(`Navigating to ${actionType.replace('-', ' ')} page...`);
+}
+});
+});
+
+document.getElementById('cancelQuickDeposit').addEventListener('click', function () {
+document.getElementById('quickDepositModal').style.display = 'none';
+});
+
+document.getElementById('confirmQuickDeposit').addEventListener('click', function () {
+const account = document.getElementById('depositAccount').value;
+const amount = parseFloat(document.getElementById('quickDepositAmount').value);
+
+if (!amount || amount <= 0) {
+alert('Please enter a valid amount');
+return;
+}
+
+processQuickDeposit(account, amount);
+});
+}
+
+function processQuickDeposit(accountId, amount) {
+const accounts = JSON.parse(localStorage.getItem('accounts'));
+const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+accounts[accountId].balance += amount;
+
+const transaction = {
+id: Date.now(),
+date: new Date().toISOString(),
+description: "Mobile Deposit",
+amount: amount,
+account: accountId,
+status: "Completed",
+type: "deposit"
+};
+
+transactions.unshift(transaction);
+
+localStorage.setItem('accounts', JSON.stringify(accounts));
+localStorage.setItem('transactions', JSON.stringify(transactions));
+
+updateAccountBalances(accounts);
+renderTransactions(transactions);
+
+document.getElementById('quickDepositModal').style.display = 'none';
+document.getElementById('quickDepositAmount').value = '';
+
+alert(`Successfully deposited ${formatCurrency(amount)} to ${accounts[accountId].name}`);
+}
+
+function initApp() {
+let accounts = initializeAccounts();
+let transactions = initializeTransactions();
+
+const transferProcessed = processPendingTransfers(accounts, transactions);
+
+updateAccountBalances(accounts);
+renderTransactions(transactions);
+
+setupMobileMenu();
+setupLogoutButton();
+setupQuickActions();
+setupDepositButtons();
+
+window.addEventListener('resize', function () {
+if (window.innerWidth > 768) {
+document.getElementById('sidebar').classList.remove('active');
+}
+});
+
+if (transferProcessed) {
+setTimeout(() => {
+alert('Your recent transfer was processed successfully!');
+}, 500);
+}
+}
+
+window.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
